@@ -777,16 +777,26 @@ async function loadAll() {
   document.getElementById('btn-refresh').classList.add('spinning');
 
   try {
-    // Fetch repos
+    // Fetch repos — intenta como org, fallback a user
     document.getElementById('load-status').textContent = 'Cargando repositorios...';
-    let repos = [], page = 1;
-    while (true) {
-      const batch = await get(`https://api.github.com/orgs/${ORG}/repos?type=public&per_page=100&page=${page}&sort=pushed`);
-      repos = repos.concat(batch);
-      if (batch.length < 100) break;
-      page++;
+    let repos = [];
+    const endpoints = [
+      `https://api.github.com/orgs/${ORG}/repos`,
+      `https://api.github.com/users/${ORG}/repos`
+    ];
+    for (const base of endpoints) {
+      try {
+        let page = 1;
+        while (true) {
+          const batch = await get(`${base}?type=public&per_page=100&page=${page}&sort=pushed`);
+          repos = repos.concat(batch);
+          if (batch.length < 100) break;
+          page++;
+        }
+        if (repos.length) break; // éxito, no necesitamos el fallback
+      } catch { repos = []; }
     }
-    if (!repos.length) throw new Error('No se encontraron repos públicos en esta organización.');
+    if (!repos.length) throw new Error('No se encontraron repos públicos. Verifica que la org/usuario existe y tiene repos públicos.');
 
     // KPIs
     const totalStars  = repos.reduce((a,r) => a + r.stargazers_count, 0);
