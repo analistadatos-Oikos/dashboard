@@ -4,438 +4,354 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>OIKOS · Dev Intelligence</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root {
-  --bg:        #070b14;
-  --bg2:       #0b1020;
-  --panel:     #0f1525;
-  --panel2:    #131929;
-  --border:    #1a2340;
-  --border2:   #1f2d4e;
-  --border3:   #263556;
+  --bg:     #060d1a;
+  --bg2:    #080f1e;
+  --panel:  #0c1528;
+  --panel2: #0f1a30;
+  --card:   #111e35;
+  --border: #162040;
+  --bord2:  #1d2d50;
+  --bord3:  #243560;
 
-  --blue:      #3b82f6;
-  --blue2:     #2563eb;
-  --blue3:     #1d4ed8;
-  --blueglow:  rgba(59,130,246,0.15);
-  --bluedim:   rgba(59,130,246,0.08);
+  --blue:   #2979ff;
+  --blue2:  #1565e0;
+  --blue3:  #448aff;
+  --blueg:  rgba(41,121,255,0.12);
+  --blueg2: rgba(41,121,255,0.06);
 
-  --cyan:      #06b6d4;
-  --cyandim:   rgba(6,182,212,0.1);
+  --cyan:   #00e5ff;
+  --cyandim:rgba(0,229,255,0.1);
 
-  --indigo:    #6366f1;
-  --indigodim: rgba(99,102,241,0.1);
+  --green:  #00e676;
+  --gdim:   rgba(0,230,118,0.1);
+  --red:    #ff1744;
+  --rdim:   rgba(255,23,68,0.1);
+  --amber:  #ffab00;
+  --adim:   rgba(255,171,0,0.1);
+  --purple: #e040fb;
+  --pdim:   rgba(224,64,251,0.1);
+  --teal:   #1de9b6;
+  --tdim:   rgba(29,233,182,0.1);
 
-  --green:     #10b981;
-  --greendim:  rgba(16,185,129,0.1);
+  --t1:  #e8f0ff;
+  --t2:  #8899bb;
+  --t3:  #3d5070;
+  --t4:  #1e2d45;
 
-  --amber:     #f59e0b;
-  --amberdim:  rgba(245,158,11,0.1);
-
-  --red:       #ef4444;
-  --reddim:    rgba(239,68,68,0.1);
-
-  --purple:    #8b5cf6;
-  --purpledim: rgba(139,92,246,0.1);
-
-  --text:      #e2e8f0;
-  --text2:     #94a3b8;
-  --text3:     #4a5568;
-  --text4:     #2d3748;
-
-  --head:  'Space Grotesk', sans-serif;
-  --body:  'Inter', sans-serif;
-
-  --r:     10px;
-  --r2:    14px;
-  --r3:    18px;
+  --r:   10px;
+  --r2:  14px;
+  --r3:  18px;
 }
+*,::before,::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;overflow-x:hidden}
 
-*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
-html { scroll-behavior: smooth; }
-body { font-family: var(--body); background: var(--bg); color: var(--text); min-height:100vh; overflow-x:hidden; }
-
-/* ── NOISE TEXTURE ── */
-body::after {
-  content:''; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.4;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
-}
-
-/* ── GLOW ORBS ── */
-.orb { position:fixed; border-radius:50%; pointer-events:none; z-index:0; filter:blur(80px); }
-.orb1 { width:600px; height:600px; top:-200px; left:-100px; background:radial-gradient(circle, rgba(37,99,235,0.12) 0%, transparent 70%); }
-.orb2 { width:500px; height:500px; bottom:-150px; right:-100px; background:radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%); }
-.orb3 { width:300px; height:300px; top:40%; left:40%; background:radial-gradient(circle, rgba(6,182,212,0.06) 0%, transparent 70%); }
+/* ── NOISE + GLOW ── */
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 60% 40% at 20% 20%,rgba(41,121,255,0.07) 0%,transparent 60%),
+             radial-gradient(ellipse 50% 40% at 80% 80%,rgba(0,229,255,0.05) 0%,transparent 60%)}
 
 /* ── SIDEBAR ── */
-#sidebar {
-  position:fixed; left:0; top:0; bottom:0; width:60px;
-  background: var(--bg2);
-  border-right: 1px solid var(--border);
-  z-index:100;
-  display:flex; flex-direction:column; align-items:center;
-  padding:20px 0; gap:4px;
-}
-.s-logo {
-  width:36px; height:36px; border-radius:9px;
-  background: linear-gradient(135deg, var(--blue2), var(--indigo));
-  display:flex; align-items:center; justify-content:center;
-  font-family:var(--head); font-weight:800; font-size:11px; color:#fff;
-  margin-bottom:20px; flex-shrink:0; letter-spacing:-0.5px;
-}
-.s-btn {
-  width:40px; height:40px; border-radius:9px;
-  background:transparent; border:none; cursor:pointer;
-  display:flex; align-items:center; justify-content:center;
-  color:var(--text3); transition:all .2s;
-}
-.s-btn:hover { background:var(--bluedim); color:var(--blue); }
-.s-btn.active { background:var(--bluedim); color:var(--blue); }
-.s-btn svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
-.s-sep { width:28px; height:1px; background:var(--border); margin:6px 0; }
-.s-bottom { margin-top:auto; display:flex; flex-direction:column; align-items:center; gap:4px; }
+#sb{position:fixed;left:0;top:0;bottom:0;width:62px;background:var(--bg2);border-right:1px solid var(--border);z-index:100;
+  display:flex;flex-direction:column;align-items:center;padding:18px 0;gap:2px}
+.sb-logo{width:38px;height:38px;border-radius:10px;background:linear-gradient(135deg,var(--blue2),var(--blue3));
+  display:flex;align-items:center;justify-content:center;font-weight:800;font-size:11px;color:#fff;margin-bottom:22px;letter-spacing:-.5px}
+.sb-btn{width:42px;height:42px;border-radius:10px;background:transparent;border:none;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;color:var(--t3);transition:all .2s;position:relative}
+.sb-btn svg{width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.sb-btn:hover{background:var(--blueg);color:var(--blue3)}
+.sb-btn.on{background:var(--blueg);color:var(--blue3)}
+.sb-btn.on::before{content:'';position:absolute;left:0;top:25%;bottom:25%;width:3px;background:var(--blue3);border-radius:0 2px 2px 0}
+.sb-sep{width:30px;height:1px;background:var(--border);margin:8px 0}
+.sb-bot{margin-top:auto;display:flex;flex-direction:column;align-items:center;gap:2px}
 
-/* ── APP SHELL ── */
-#app { margin-left:60px; min-height:100vh; position:relative; z-index:10; }
+/* ── APP ── */
+#app{margin-left:62px;min-height:100vh;position:relative;z-index:10}
 
 /* ── TOPBAR ── */
-#topbar {
-  position:sticky; top:0; z-index:50; height:58px;
-  background:rgba(7,11,20,0.8); backdrop-filter:blur(24px);
-  border-bottom:1px solid var(--border);
-  display:flex; align-items:center; padding:0 28px; gap:12px;
-}
-.tb-brand { font-family:var(--head); font-size:18px; font-weight:800; color:#fff; flex:1; letter-spacing:-.3px; }
-.tb-brand span { color:var(--blue); }
-.tb-org {
-  display:flex; align-items:center; gap:7px;
-  background:var(--panel); border:1px solid var(--border2);
-  padding:5px 12px; border-radius:8px; font-size:11px; color:var(--text2);
-}
-.tb-org svg { width:14px; height:14px; fill:none; stroke:var(--blue); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
-.live-badge {
-  display:flex; align-items:center; gap:5px;
-  background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25);
-  padding:4px 10px; border-radius:20px;
-  font-size:10px; font-weight:600; letter-spacing:1.5px; color:var(--green);
-}
-.live-dot { width:5px; height:5px; border-radius:50%; background:var(--green); animation:glow 2s infinite; }
-@keyframes glow { 0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.5)} 50%{box-shadow:0 0 0 5px rgba(16,185,129,0)} }
-.tb-time { font-size:11px; color:var(--text3); }
-#btn-refresh {
-  display:flex; align-items:center; gap:6px;
-  padding:7px 14px; border-radius:8px;
-  background:var(--bluedim); border:1px solid var(--border2);
-  color:var(--blue); font-family:var(--body); font-size:11px; font-weight:600;
-  cursor:pointer; letter-spacing:.3px; transition:all .2s;
-}
-#btn-refresh:hover { background:var(--blueglow); border-color:var(--blue); }
-#btn-refresh svg { width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
-#btn-refresh.spinning svg { animation:spin .7s linear infinite; }
-@keyframes spin { to{transform:rotate(360deg)} }
+#top{position:sticky;top:0;z-index:50;height:54px;background:rgba(6,13,26,0.85);backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 24px;gap:12px}
+.top-brand{font-size:16px;font-weight:700;color:var(--t1);letter-spacing:-.3px;flex:1}
+.top-brand span{color:var(--blue3)}
+.top-tab{display:flex;align-items:center;gap:4px;background:var(--panel);border:1px solid var(--border);
+  border-radius:8px;padding:4px}
+.t-tab{padding:5px 12px;border-radius:6px;font-size:11px;font-weight:600;color:var(--t3);border:none;
+  background:transparent;cursor:pointer;transition:all .2s}
+.t-tab.on{background:var(--blue2);color:#fff}
+.t-tab:hover:not(.on){color:var(--t2)}
+.top-pills{display:flex;align-items:center;gap:8px}
+.live-p{display:flex;align-items:center;gap:5px;background:rgba(0,230,118,0.1);border:1px solid rgba(0,230,118,.25);
+  padding:4px 10px;border-radius:20px;font-size:10px;font-weight:600;color:var(--green);letter-spacing:1px}
+.ldot{width:5px;height:5px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,230,118,.5)}50%{box-shadow:0 0 0 5px rgba(0,230,118,0)}}
+.rate-p{font-size:10px;color:var(--t3);background:var(--panel);border:1px solid var(--border);
+  padding:4px 10px;border-radius:20px;cursor:pointer;transition:all .2s}
+.rate-p:hover{border-color:var(--bord2);color:var(--t2)}
+#top-time{font-size:11px;color:var(--t3)}
+#btn-ref{display:flex;align-items:center;gap:6px;padding:7px 14px;border-radius:8px;
+  background:var(--blueg);border:1px solid var(--bord2);color:var(--blue3);
+  font-size:11px;font-weight:600;cursor:pointer;transition:all .2s}
+#btn-ref:hover{background:var(--blueg2);border-color:var(--blue)}
+#btn-ref svg{width:13px;height:13px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+#btn-ref.sp svg{animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
 
 /* ── CONTENT ── */
-#content { padding:24px 28px 40px; }
+#cnt{padding:20px 24px 40px}
 
 /* ── KPI STRIP ── */
-.kpi-grid {
-  display:grid; grid-template-columns:repeat(6,1fr);
-  gap:10px; margin-bottom:20px;
-}
-.kpi {
-  background:var(--panel); border:1px solid var(--border);
-  border-radius:var(--r2); padding:16px 18px;
-  position:relative; overflow:hidden;
-  opacity:0; animation:up .5s forwards;
-  transition:border-color .2s, transform .2s;
-}
-.kpi:hover { border-color:var(--border2); transform:translateY(-2px); }
-.kpi::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--ac, var(--blue)); }
-.kpi-ico {
-  width:32px; height:32px; border-radius:8px;
-  display:flex; align-items:center; justify-content:center;
-  margin-bottom:10px;
-  background:var(--ac-dim, var(--bluedim));
-}
-.kpi-ico svg { width:16px; height:16px; fill:none; stroke:var(--ac,var(--blue)); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
-.kpi-val { font-family:var(--head); font-size:28px; font-weight:800; color:#fff; line-height:1; margin-bottom:4px; }
-.kpi-lbl { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:1.5px; }
-.kpi-sub { font-size:10px; color:var(--text3); margin-top:4px; }
-@keyframes up { to{opacity:1;transform:translateY(0)} }
+.kpi-row{display:grid;grid-template-columns:repeat(7,1fr);gap:10px;margin-bottom:18px}
+.kpi{background:var(--panel);border:1px solid var(--border);border-radius:var(--r2);padding:14px 16px;
+  position:relative;overflow:hidden;opacity:0;animation:up .5s forwards;transition:border-color .2s,transform .2s}
+.kpi:hover{border-color:var(--bord2);transform:translateY(-2px)}
+.kpi::after{content:'';position:absolute;inset:0;background:linear-gradient(135deg,rgba(255,255,255,.02) 0%,transparent 60%);pointer-events:none}
+.kpi-ac{position:absolute;top:0;left:0;right:0;height:2px;background:var(--ac,var(--blue3))}
+.kpi-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
+.kpi-ico{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;
+  background:var(--ac-d,var(--blueg));flex-shrink:0}
+.kpi-ico svg{width:15px;height:15px;fill:none;stroke:var(--ac,var(--blue3));stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.kpi-trend{font-size:10px;font-weight:700;padding:2px 6px;border-radius:4px}
+.kpi-trend.up{background:rgba(0,230,118,.15);color:var(--green)}
+.kpi-trend.dn{background:rgba(255,23,68,.15);color:var(--red)}
+.kpi-trend.nt{background:var(--panel2);color:var(--t3)}
+.kpi-v{font-size:26px;font-weight:800;color:var(--t1);line-height:1;margin-bottom:3px}
+.kpi-l{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3)}
+.kpi-sub{font-size:10px;color:var(--t3);margin-top:4px}
+@keyframes up{to{opacity:1;transform:translateY(0)}}
 
-/* ── SECTION TITLE ── */
-.sec-hd {
-  display:flex; align-items:center; justify-content:space-between;
-  margin-bottom:14px;
-}
-.sec-lbl {
-  font-size:10px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--text3);
-  display:flex; align-items:center; gap:8px;
-}
-.sec-lbl::before { content:''; width:3px; height:13px; border-radius:2px; background:var(--blue); }
-.sec-badge {
-  font-size:10px; color:var(--blue); background:var(--bluedim);
-  border:1px solid rgba(59,130,246,.2); padding:2px 10px; border-radius:20px;
-}
+/* ── MAIN GRID ── */
+.main-grid{display:grid;grid-template-columns:1fr 1fr 320px;gap:14px;margin-bottom:14px}
+.main-grid2{display:grid;grid-template-columns:320px 1fr 1fr;gap:14px;margin-bottom:14px}
+.main-grid3{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:14px;margin-bottom:14px}
 
-/* ── CHART GRID ── */
-.chart-grid-top {
-  display:grid; grid-template-columns:2fr 1fr;
-  gap:14px; margin-bottom:14px;
-}
-.chart-grid-mid {
-  display:grid; grid-template-columns:1fr 1fr 1fr;
-  gap:14px; margin-bottom:20px;
-}
-.chart-panel {
-  background:var(--panel); border:1px solid var(--border);
-  border-radius:var(--r2); padding:20px;
-  opacity:0; animation:up .5s forwards;
-}
-.chart-hd {
-  display:flex; align-items:center; justify-content:space-between;
-  margin-bottom:16px;
-}
-.chart-title {
-  font-size:12px; font-weight:600; color:var(--text2);
-  display:flex; align-items:center; gap:7px;
-}
-.chart-title svg { width:14px; height:14px; fill:none; stroke:var(--blue); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
-.chart-badge { font-size:9px; color:var(--text3); background:var(--panel2); border:1px solid var(--border); padding:2px 8px; border-radius:4px; }
-.chart-wrap { position:relative; }
+/* ── PANEL ── */
+.pnl{background:var(--panel);border:1px solid var(--border);border-radius:var(--r2);padding:18px;
+  opacity:0;animation:up .5s forwards;transition:border-color .2s}
+.pnl:hover{border-color:var(--bord2)}
+.pnl-hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.pnl-title{font-size:12px;font-weight:600;color:var(--t2);display:flex;align-items:center;gap:7px}
+.pnl-title svg{width:14px;height:14px;fill:none;stroke:var(--blue3);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.pnl-badge{font-size:9px;color:var(--t3);background:var(--panel2);border:1px solid var(--border);padding:2px 8px;border-radius:4px}
+.pnl-num{font-size:10px;color:var(--t3)}
+
+/* ── CHART AREAS ── */
+.cw{position:relative}
+
+/* ── REPO SPOTLIGHT ── */
+.spotlight{background:linear-gradient(135deg,var(--panel2),var(--panel));border:1px solid var(--bord2);
+  border-radius:var(--r2);padding:18px;grid-row:span 2;opacity:0;animation:up .5s .3s forwards}
+.spot-head{margin-bottom:16px}
+.spot-name{font-size:18px;font-weight:800;color:var(--t1);margin-bottom:4px}
+.spot-desc{font-size:11px;color:var(--t3);line-height:1.5}
+.spot-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.spot-stat{background:var(--panel);border:1px solid var(--border);border-radius:9px;padding:10px 12px;text-align:center}
+.spot-stat-v{font-size:20px;font-weight:800;color:var(--t1)}
+.spot-stat-l{font-size:9px;color:var(--t3);letter-spacing:1px;text-transform:uppercase}
+.spot-bar-wrap{margin-bottom:14px}
+.spot-bar-lbl{display:flex;justify-content:space-between;margin-bottom:5px;font-size:10px;color:var(--t3)}
+.bar-track{height:5px;background:var(--border);border-radius:3px;overflow:hidden}
+.bar-fill{height:100%;border-radius:3px;transition:width 1.2s ease}
+
+/* ── LANG BARS ── */
+.lang-rows{display:flex;flex-direction:column;gap:8px}
+.lang-row{display:flex;align-items:center;gap:10px}
+.lang-name{font-size:11px;color:var(--t2);width:80px;flex-shrink:0}
+.lang-track{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden}
+.lang-fill{height:100%;border-radius:3px}
+.lang-pct{font-size:10px;color:var(--t3);width:32px;text-align:right;flex-shrink:0}
+.lang-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
 
 /* ── TIMELINE ── */
-.timeline-panel {
-  background:var(--panel); border:1px solid var(--border);
-  border-radius:var(--r2); padding:20px; margin-bottom:20px;
-  opacity:0; animation:up .5s forwards;
-}
-.tl-entries { display:flex; flex-direction:column; gap:0; margin-top:4px; }
-.tl-entry {
-  display:flex; gap:16px; padding:12px 0;
-  border-bottom:1px solid var(--border);
-  transition:background .15s;
-}
-.tl-entry:last-child { border-bottom:none; }
-.tl-entry:hover { background:rgba(59,130,246,.03); margin:0 -20px; padding:12px 20px; }
-.tl-left { display:flex; flex-direction:column; align-items:center; gap:0; width:60px; flex-shrink:0; }
-.tl-time { font-size:9px; color:var(--text3); white-space:nowrap; }
-.tl-line { flex:1; width:1px; background:var(--border); margin:4px 0; min-height:12px; }
-.tl-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; border:2px solid; }
-.tl-dot.fresh  { background:var(--green);  border-color:var(--green);  box-shadow:0 0 8px var(--green);  }
-.tl-dot.warm   { background:var(--amber);  border-color:var(--amber);  }
-.tl-dot.cold   { background:var(--text4);  border-color:var(--text4);  }
-.tl-body { flex:1; min-width:0; }
-.tl-repo { font-size:13px; font-weight:600; color:#fff; margin-bottom:2px; }
-.tl-msg  { font-size:11px; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.tl-meta { display:flex; align-items:center; gap:10px; margin-top:5px; }
-.tl-tag  {
-  font-size:9px; padding:1px 7px; border-radius:4px; font-weight:600;
-  display:flex; align-items:center; gap:4px;
-}
-.tl-tag svg { width:10px; height:10px; fill:none; stroke:currentColor; stroke-width:2; }
-.tl-tag.commit { background:var(--bluedim);  color:var(--blue);  border:1px solid rgba(59,130,246,.2); }
-.tl-tag.lang   { background:var(--panel2);   color:var(--text2); border:1px solid var(--border); }
-.tl-right { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
-.tl-hash { font-size:10px; color:var(--text3); font-family:monospace; }
-.tl-size { font-size:9px; color:var(--text3); }
+.tl{display:flex;flex-direction:column;gap:0;max-height:340px;overflow-y:auto}
+.tl::-webkit-scrollbar{width:4px}
+.tl::-webkit-scrollbar-track{background:var(--panel2)}
+.tl::-webkit-scrollbar-thumb{background:var(--bord2);border-radius:2px}
+.tl-item{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--border);transition:background .15s}
+.tl-item:hover{background:rgba(41,121,255,.04);margin:0 -18px;padding:10px 18px}
+.tl-item:last-child{border-bottom:none}
+.tl-left{display:flex;flex-direction:column;align-items:center;width:48px;flex-shrink:0}
+.tl-t{font-size:9px;color:var(--t3);text-align:center;white-space:nowrap}
+.tl-vl{flex:1;width:1px;background:var(--border);margin:4px 0;min-height:8px}
+.tl-dot2{width:8px;height:8px;border-radius:50%;border:2px solid;flex-shrink:0}
+.tl-dot2.fr{background:var(--green);border-color:var(--green);box-shadow:0 0 8px var(--green)}
+.tl-dot2.wm{background:var(--amber);border-color:var(--amber)}
+.tl-dot2.cl{background:var(--t4);border-color:var(--t4)}
+.tl-body{flex:1;min-width:0;padding-left:10px}
+.tl-repo{font-size:12px;font-weight:600;color:var(--t1);margin-bottom:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-msg{font-size:10px;color:var(--t3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tl-tags{display:flex;gap:5px;margin-top:4px;flex-wrap:wrap}
+.tg{font-size:8px;padding:1px 6px;border-radius:3px;font-weight:600;border:1px solid}
+.tg.c{background:var(--blueg);color:var(--blue3);border-color:rgba(41,121,255,.2)}
+.tg.l{background:var(--panel2);color:var(--t3);border-color:var(--border)}
+.tl-hash{font-size:9px;color:var(--t3);font-family:monospace;flex-shrink:0;margin-left:auto;padding-left:8px;align-self:flex-start}
+
+/* ── STORAGE GAUGE ── */
+.gauge-wrap{display:flex;flex-direction:column;align-items:center;gap:6px}
+.gauge-svg{overflow:visible}
+.gauge-val{font-size:22px;font-weight:800;fill:var(--t1);text-anchor:middle}
+.gauge-lbl2{font-size:10px;fill:var(--t3);text-anchor:middle}
+.storage-items{display:flex;flex-direction:column;gap:6px;width:100%}
+.si{display:flex;align-items:center;gap:8px}
+.si-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.si-lbl{font-size:11px;color:var(--t2);flex:1}
+.si-val{font-size:11px;color:var(--t1);font-weight:600}
+.si-bar{flex:2;height:4px;background:var(--border);border-radius:2px;overflow:hidden}
+.si-fill{height:100%;border-radius:2px}
+
+/* ── ACTIVITY HEATMAP ── */
+.heatmap-grid{display:flex;flex-direction:column;gap:3px;overflow-x:auto;padding-bottom:4px}
+.heatmap-row{display:flex;gap:3px}
+.hm-cell{width:12px;height:12px;border-radius:2px;flex-shrink:0;transition:transform .15s}
+.hm-cell:hover{transform:scale(1.4);z-index:10;position:relative}
+.hm-0{background:var(--border)}
+.hm-1{background:rgba(41,121,255,.35)}
+.hm-2{background:rgba(41,121,255,.6)}
+.hm-3{background:rgba(41,121,255,.85)}
+.hm-4{background:var(--blue3)}
+
+/* ── REPO TABLE ── */
+.rtable{width:100%;border-collapse:collapse}
+.rtable th{font-size:9px;text-transform:uppercase;letter-spacing:1.5px;color:var(--t3);
+  padding:0 10px 10px;text-align:left;border-bottom:1px solid var(--border);font-weight:600}
+.rtable th:last-child,.rtable td:last-child{text-align:right}
+.rtable td{padding:10px;font-size:11px;color:var(--t2);border-bottom:1px solid var(--border);vertical-align:middle}
+.rtable tr:last-child td{border-bottom:none}
+.rtable tr:hover td{background:rgba(41,121,255,.04)}
+.rtable .rname{font-size:12px;font-weight:600;color:var(--t1);max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rtable .badge-lang{font-size:9px;padding:2px 7px;border-radius:4px;font-weight:600;border:1px solid;white-space:nowrap}
+.rtable .val-g{color:var(--green);font-weight:600}
+.rtable .val-r{color:var(--red);font-weight:600}
+.rtable .val-b{color:var(--blue3);font-weight:600}
+.trend-arrow{font-size:10px}
+.push-tag{display:inline-flex;align-items:center;gap:4px;font-size:9px;padding:2px 7px;border-radius:4px}
+.push-tag.fr{background:rgba(0,230,118,.1);color:var(--green);border:1px solid rgba(0,230,118,.2)}
+.push-tag.wm{background:var(--adim);color:var(--amber);border:1px solid rgba(255,171,0,.2)}
+.push-tag.cl{background:var(--panel2);color:var(--t3);border:1px solid var(--border)}
 
 /* ── REPO CARDS ── */
-#cards-grid {
-  display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr));
-  gap:12px;
-}
-.repo-card {
-  background:var(--panel); border:1px solid var(--border);
-  border-radius:var(--r2); overflow:hidden;
-  opacity:0; transform:translateY(10px);
-  animation:up .4s forwards;
-  transition:border-color .25s, box-shadow .25s, transform .25s;
-}
-.repo-card:hover {
-  border-color:var(--border3);
-  box-shadow:0 0 0 1px var(--border2), 0 16px 48px rgba(0,0,0,.5), inset 0 1px 0 rgba(59,130,246,.05);
-  transform:translateY(-3px);
-}
-.card-top-bar { height:2px; }
-.card-inner { padding:18px 20px; display:flex; flex-direction:column; gap:14px; }
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(340px,1fr));gap:12px;margin-top:18px}
+.rcard{background:var(--panel);border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;
+  opacity:0;transform:translateY(8px);animation:up .4s forwards;transition:border-color .25s,box-shadow .25s,transform .25s}
+.rcard:hover{border-color:var(--bord3);box-shadow:0 8px 40px rgba(0,0,0,.5),inset 0 1px 0 rgba(41,121,255,.06);transform:translateY(-3px)}
+.rcard-accent{height:2px}
+.rcard-body{padding:16px 18px;display:flex;flex-direction:column;gap:12px}
+.rc-hd{display:flex;align-items:flex-start;gap:10px}
+.rc-ico{width:34px;height:34px;border-radius:9px;background:var(--blueg);border:1px solid var(--bord2);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.rc-ico svg{width:17px;height:17px;fill:none;stroke:var(--blue3);stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.rc-name{font-size:13px;font-weight:700;color:var(--t1);margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rc-desc{font-size:10px;color:var(--t3);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.lchip{display:inline-flex;align-items:center;gap:4px;padding:2px 8px;border-radius:4px;font-size:9px;font-weight:600;border:1px solid;letter-spacing:.3px;flex-shrink:0}
+.ldot2{width:5px;height:5px;border-radius:50%}
+.rc-stats{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--border);border-radius:8px;overflow:hidden}
+.rcs{padding:8px 5px;display:flex;flex-direction:column;align-items:center;gap:2px;border-right:1px solid var(--border)}
+.rcs:last-child{border-right:none}
+.rcs:hover{background:rgba(255,255,255,.02)}
+.rcs svg{width:11px;height:11px;fill:none;stroke:var(--t3);stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;margin-bottom:1px}
+.rcs-v{font-size:13px;font-weight:700;color:var(--t1)}
+.rcs-l{font-size:7px;color:var(--t3);letter-spacing:1px;text-transform:uppercase}
+.rc-health{display:flex;flex-direction:column;gap:4px}
+.rch-row{display:flex;align-items:center;gap:7px}
+.rch-l{font-size:9px;color:var(--t3);width:46px;flex-shrink:0}
+.rch-bar{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.rch-fill{height:100%;border-radius:2px;transition:width 1s ease}
+.rch-v{font-size:9px;color:var(--t2);width:24px;text-align:right;flex-shrink:0}
+.rc-commits{display:flex;flex-direction:column;gap:4px}
+.rc-clbl{font-size:8px;text-transform:uppercase;letter-spacing:2px;color:var(--t3);margin-bottom:2px}
+.cc{display:flex;align-items:center;gap:7px;padding:5px 8px;border-radius:6px;background:var(--panel2);border:1px solid var(--border);transition:border-color .15s}
+.cc:hover{border-color:var(--bord2)}
+.cc-h{font-size:9px;color:var(--blue3);font-family:monospace;font-weight:600;flex-shrink:0;min-width:46px}
+.cc-m{font-size:10px;color:var(--t2);flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cc-t{font-size:8px;color:var(--t3);flex-shrink:0}
+.rc-foot{display:flex;align-items:center;justify-content:space-between;padding-top:10px;border-top:1px solid var(--border)}
+.push-ind2{display:flex;align-items:center;gap:5px;font-size:9px;color:var(--t3)}
+.pd{width:5px;height:5px;border-radius:50%}
+.pd.fr{background:var(--green);box-shadow:0 0 6px var(--green)}
+.pd.wm{background:var(--amber)}
+.pd.cl{background:var(--t4)}
+.gh-a{display:flex;align-items:center;gap:3px;color:var(--blue3);text-decoration:none;font-size:10px;font-weight:600;transition:color .15s}
+.gh-a:hover{color:#93c5fd}
+.gh-a svg{width:9px;height:9px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
 
-.card-hd { display:flex; align-items:flex-start; gap:10px; }
-.card-hd-icon {
-  width:36px; height:36px; border-radius:9px; flex-shrink:0;
-  background:var(--bluedim); border:1px solid var(--border2);
-  display:flex; align-items:center; justify-content:center;
-}
-.card-hd-icon svg { width:18px; height:18px; fill:none; stroke:var(--blue); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
-.card-name { font-family:var(--head); font-size:14px; font-weight:700; color:#fff; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.card-desc { font-size:11px; color:var(--text3); line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
-
-/* Stats row */
-.card-stats {
-  display:grid; grid-template-columns:repeat(4,1fr);
-  border:1px solid var(--border); border-radius:9px; overflow:hidden;
-}
-.cs { padding:9px 6px; display:flex; flex-direction:column; align-items:center; gap:2px; border-right:1px solid var(--border); }
-.cs:last-child { border-right:none; }
-.cs:hover { background:rgba(255,255,255,.02); }
-.cs-ico { margin-bottom:1px; }
-.cs-ico svg { width:12px; height:12px; fill:none; stroke:var(--text3); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; display:block; }
-.cs-v { font-family:var(--head); font-size:15px; font-weight:700; color:#fff; }
-.cs-l { font-size:8px; color:var(--text3); letter-spacing:1px; text-transform:uppercase; }
-
-/* Health bar */
-.card-health { display:flex; flex-direction:column; gap:5px; }
-.health-row { display:flex; align-items:center; gap:8px; }
-.health-lbl { font-size:10px; color:var(--text3); width:54px; flex-shrink:0; }
-.health-bar { flex:1; height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
-.health-fill { height:100%; border-radius:2px; transition:width 1s ease; }
-.health-val { font-size:10px; color:var(--text2); width:28px; text-align:right; flex-shrink:0; }
-
-/* Issues */
-.card-issues { display:flex; gap:8px; }
-.iss {
-  flex:1; padding:8px 10px; border-radius:8px;
-  display:flex; align-items:center; gap:8px; justify-content:space-between;
-  font-size:10px; font-weight:600;
-}
-.iss svg { width:12px; height:12px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
-.iss.open   { background:var(--greendim); color:var(--green); border:1px solid rgba(16,185,129,.2); }
-.iss.branch { background:var(--bluedim);  color:var(--blue);  border:1px solid rgba(59,130,246,.2); }
-.iss.lang   { background:var(--indigodim);color:var(--indigo);border:1px solid rgba(99,102,241,.2); }
-.iss-num { font-family:var(--head); font-size:18px; font-weight:800; }
-
-/* Commits mini */
-.card-commits-lbl { font-size:9px; color:var(--text3); letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
-.c-row {
-  display:flex; align-items:center; gap:8px;
-  padding:6px 9px; border-radius:7px;
-  background:var(--panel2); border:1px solid var(--border);
-  margin-bottom:4px;
-  transition:border-color .15s;
-}
-.c-row:hover { border-color:var(--border2); }
-.c-hash { font-size:10px; color:var(--blue); font-family:monospace; font-weight:600; flex-shrink:0; min-width:50px; }
-.c-msg  { font-size:10px; color:var(--text2); flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-.c-time { font-size:9px; color:var(--text3); flex-shrink:0; }
-
-/* Card footer */
-.card-foot {
-  display:flex; align-items:center; justify-content:space-between;
-  padding-top:12px; border-top:1px solid var(--border);
-}
-.push-ind { display:flex; align-items:center; gap:6px; font-size:10px; color:var(--text3); }
-.pdot { width:6px; height:6px; border-radius:50%; }
-.pdot.fresh { background:var(--green); box-shadow:0 0 7px var(--green); }
-.pdot.warm  { background:var(--amber); }
-.pdot.cold  { background:var(--text4); }
-.gh-link {
-  display:flex; align-items:center; gap:4px;
-  color:var(--blue); text-decoration:none; font-size:10px; font-weight:600;
-  transition:color .15s;
-}
-.gh-link:hover { color:#93c5fd; }
-.gh-link svg { width:10px; height:10px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
-
-/* Lang chip */
-.lchip {
-  display:inline-flex; align-items:center; gap:5px;
-  padding:3px 9px; border-radius:5px; font-size:9px; font-weight:600;
-  border:1px solid; letter-spacing:.3px;
-}
-.ldot { width:6px; height:6px; border-radius:50%; }
-
-/* ── LOADING ── */
-#loader {
-  position:fixed; inset:0; z-index:300;
-  background:var(--bg);
-  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px;
-}
-.l-logo { font-family:var(--head); font-size:42px; font-weight:800; color:#fff; opacity:0; animation:up .5s .1s forwards; }
-.l-logo span { color:var(--blue); }
-.l-bar-wrap { width:220px; height:2px; background:var(--border); border-radius:2px; overflow:hidden; opacity:0; animation:up .5s .3s forwards; }
-.l-bar { height:100%; background:linear-gradient(90deg, var(--blue3), var(--blue), var(--cyan)); border-radius:2px; animation:prog 2.5s ease forwards; }
-@keyframes prog { 0%{width:0} 60%{width:75%} 100%{width:100%} }
-.l-status { font-size:11px; color:var(--text3); letter-spacing:1px; opacity:0; animation:up .5s .5s forwards; }
+/* ── LOADER ── */
+#ldr{position:fixed;inset:0;z-index:300;background:var(--bg);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+.l-logo{font-size:38px;font-weight:800;color:#fff;opacity:0;animation:up .5s .1s forwards}
+.l-logo span{color:var(--blue3)}
+.l-bar-w{width:200px;height:2px;background:var(--border);border-radius:2px;overflow:hidden;opacity:0;animation:up .5s .3s forwards}
+.l-bar{height:100%;background:linear-gradient(90deg,var(--blue2),var(--cyan));border-radius:2px;animation:prg 2.5s ease forwards}
+@keyframes prg{0%{width:0}70%{width:80%}100%{width:100%}}
+.l-st{font-size:11px;color:var(--t3);letter-spacing:1px;opacity:0;animation:up .5s .5s forwards}
 
 /* ── TOAST ── */
-#toast {
-  display:none; position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
-  background:var(--reddim); border:1px solid rgba(239,68,68,.3); color:var(--red);
-  padding:10px 20px; border-radius:10px; font-size:12px; z-index:400; max-width:500px; text-align:center;
-}
+#toast{display:none;position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+  background:var(--rdim);border:1px solid rgba(255,23,68,.3);color:var(--red);
+  padding:10px 20px;border-radius:10px;font-size:12px;z-index:400;max-width:500px;text-align:center}
 
 /* ── TOKEN MODAL ── */
-#tmodal { display:none; position:fixed; inset:0; z-index:500; background:rgba(0,0,0,.7); backdrop-filter:blur(8px); align-items:center; justify-content:center; }
-#tmodal.open { display:flex; }
-.mbox { background:var(--panel); border:1px solid var(--border2); border-radius:20px; padding:28px; width:460px; max-width:90vw; }
-.m-title { font-family:var(--head); font-size:20px; font-weight:800; color:#fff; margin-bottom:6px; }
-.m-sub   { font-size:12px; color:var(--text3); line-height:1.6; margin-bottom:18px; }
-.m-input { width:100%; padding:11px 14px; background:var(--bg2); border:1px solid var(--border2); border-radius:9px; color:#fff; font-family:var(--body); font-size:12px; outline:none; margin-bottom:12px; transition:border-color .2s; }
-.m-input:focus { border-color:var(--blue); }
-.m-btns { display:flex; gap:8px; }
-.m-btn { flex:1; padding:10px; border-radius:9px; font-family:var(--body); font-size:12px; font-weight:600; cursor:pointer; border:none; transition:all .2s; }
-.m-btn.p { background:var(--blue2); color:#fff; }
-.m-btn.p:hover { background:var(--blue3); }
-.m-btn.s { background:var(--border); color:var(--text3); }
-.m-btn.s:hover { background:var(--border2); color:var(--text); }
+#tmod{display:none;position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);align-items:center;justify-content:center}
+#tmod.o{display:flex}
+.mbox{background:var(--panel);border:1px solid var(--bord2);border-radius:18px;padding:26px;width:440px;max-width:90vw}
+.m-t{font-size:18px;font-weight:800;color:var(--t1);margin-bottom:5px}
+.m-s{font-size:11px;color:var(--t3);line-height:1.6;margin-bottom:16px}
+.m-inp{width:100%;padding:10px 14px;background:var(--bg2);border:1px solid var(--bord2);border-radius:9px;color:#fff;font-family:'Inter';font-size:12px;outline:none;margin-bottom:12px;transition:border-color .2s}
+.m-inp:focus{border-color:var(--blue)}
+.m-bs{display:flex;gap:8px}
+.m-b{flex:1;padding:10px;border-radius:9px;font-family:'Inter';font-size:12px;font-weight:600;cursor:pointer;border:none;transition:all .2s}
+.m-b.p{background:var(--blue2);color:#fff}
+.m-b.p:hover{background:var(--blue3)}
+.m-b.s{background:var(--border);color:var(--t3)}
+.m-b.s:hover{background:var(--bord2);color:var(--t2)}
 
-@media(max-width:1100px) { .kpi-grid{grid-template-columns:repeat(3,1fr)} }
-@media(max-width:900px)  { .chart-grid-top,.chart-grid-mid{grid-template-columns:1fr} }
-@media(max-width:700px)  { #sidebar{display:none} #app{margin-left:0} #content{padding:16px} .kpi-grid{grid-template-columns:repeat(2,1fr)} }
+@media(max-width:1200px){.main-grid,.main-grid2{grid-template-columns:1fr 1fr}.main-grid3{grid-template-columns:1fr 1fr}}
+@media(max-width:900px){.kpi-row{grid-template-columns:repeat(4,1fr)}.main-grid,.main-grid2,.main-grid3{grid-template-columns:1fr}}
+@media(max-width:600px){#sb{display:none}#app{margin-left:0}.kpi-row{grid-template-columns:repeat(2,1fr)}}
 </style>
 </head>
 <body>
 
-<div class="orb orb1"></div>
-<div class="orb orb2"></div>
-<div class="orb orb3"></div>
-
 <!-- LOADER -->
-<div id="loader">
+<div id="ldr">
   <div class="l-logo">OIKOS <span>Dev</span></div>
-  <div class="l-bar-wrap"><div class="l-bar"></div></div>
-  <div class="l-status" id="l-status">Inicializando...</div>
+  <div class="l-bar-w"><div class="l-bar"></div></div>
+  <div class="l-st" id="l-st">Inicializando sistema...</div>
 </div>
 
-<!-- TOAST -->
 <div id="toast"></div>
 
 <!-- TOKEN MODAL -->
-<div id="tmodal">
+<div id="tmod">
   <div class="mbox">
-    <div class="m-title">GitHub Token</div>
-    <div class="m-sub">Para repos privados y mayor rate limit (5000 req/h vs 60 req/h). Se guarda en tu browser, no sale a ningún servidor.</div>
-    <input class="m-input" type="password" id="tk-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
-    <div class="m-btns">
-      <button class="m-btn p" onclick="applyTk()">Aplicar token</button>
-      <button class="m-btn s" onclick="closeTk()">Cancelar</button>
+    <div class="m-t">GitHub Token</div>
+    <div class="m-s">Para repos privados y 5000 req/h (vs 60 sin token). Se guarda solo en tu browser.</div>
+    <input class="m-inp" type="password" id="tk-inp" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+    <div class="m-bs">
+      <button class="m-b p" onclick="applyTk()">Aplicar</button>
+      <button class="m-b s" onclick="closeTk()">Cancelar</button>
     </div>
   </div>
 </div>
 
 <!-- SIDEBAR -->
-<div id="sidebar">
-  <div class="s-logo">OK</div>
-  <button class="s-btn active" title="Dashboard">
-    <!-- grid icon -->
+<div id="sb">
+  <div class="sb-logo">OK</div>
+  <button class="sb-btn on" title="Dashboard">
     <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
   </button>
-  <div class="s-sep"></div>
-  <button class="s-btn" title="Token" onclick="openTk()">
-    <!-- key icon -->
+  <div class="sb-sep"></div>
+  <button class="sb-btn" title="Token GitHub" onclick="openTk()">
     <svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="5"/><path d="M21 3l-9.4 9.4M15.5 4.5l3 3"/></svg>
   </button>
-  <button class="s-btn" title="Refrescar" onclick="refreshAll()">
-    <!-- refresh icon -->
+  <button class="sb-btn" title="Refresh" onclick="refreshAll()">
     <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
   </button>
-  <div class="s-sep"></div>
-  <div class="s-bottom">
-    <button class="s-btn" title="GitHub" onclick="window.open('https://github.com/'+ORG,'_blank')">
-      <!-- github icon -->
+  <div class="sb-sep"></div>
+  <div class="sb-bot">
+    <button class="sb-btn" title="GitHub" onclick="window.open('https://github.com/'+ORG,'_blank')">
       <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
     </button>
   </div>
@@ -443,553 +359,652 @@ body::after {
 
 <!-- APP -->
 <div id="app">
-  <div id="topbar">
-    <div class="tb-brand">OIKOS <span>Dev Intelligence</span></div>
-    <div class="tb-org">
-      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-      <span id="org-label">analistadatos-Oikos</span>
+  <div id="top">
+    <div class="top-brand">OIKOS <span>Dev Intelligence</span></div>
+    <div class="top-tab">
+      <button class="t-tab on">Overview</button>
+      <button class="t-tab">Repos</button>
+      <button class="t-tab">Timeline</button>
     </div>
-    <div class="live-badge"><div class="live-dot"></div>LIVE</div>
-    <div class="tb-time" id="tb-time">—</div>
-    <button id="btn-refresh" onclick="refreshAll()">
+    <div class="top-pills">
+      <div class="live-p"><div class="ldot"></div>LIVE</div>
+      <div class="rate-p" id="rate-info" onclick="openTk()">API: Público</div>
+      <div id="top-time">—</div>
+    </div>
+    <button id="btn-ref" onclick="refreshAll()">
       <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
       Refrescar
     </button>
   </div>
 
-  <div id="content" style="display:none">
+  <div id="cnt" style="display:none">
 
     <!-- KPIs -->
-    <div class="kpi-grid" id="kpi-grid">
-      <div class="kpi" style="--ac:var(--blue);--ac-dim:var(--bluedim);animation-delay:.05s">
-        <div class="kpi-ico"><svg viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg></div>
-        <div class="kpi-val" id="k-repos">0</div>
-        <div class="kpi-lbl">Repositorios</div>
+    <div class="kpi-row">
+      <div class="kpi" style="--ac:var(--blue3);--ac-d:var(--blueg);animation-delay:.04s">
+        <div class="kpi-ac"></div>
+        <div class="kpi-top">
+          <div class="kpi-ico"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></div>
+          <span class="kpi-trend nt" id="k-repos-t">—</span>
+        </div>
+        <div class="kpi-v" id="k-repos">0</div>
+        <div class="kpi-l">Repositorios</div>
         <div class="kpi-sub">públicos activos</div>
       </div>
-      <div class="kpi" style="--ac:var(--amber);--ac-dim:var(--amberdim);animation-delay:.1s">
-        <div class="kpi-ico"><svg viewBox="0 0 24 24" style="stroke:var(--amber)"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-        <div class="kpi-val" id="k-stars">0</div>
-        <div class="kpi-lbl">Total Stars</div>
-        <div class="kpi-sub">acumuladas</div>
+      <div class="kpi" style="--ac:var(--amber);--ac-d:var(--adim);animation-delay:.08s">
+        <div class="kpi-ac"></div>
+        <div class="kpi-top">
+          <div class="kpi-ico"><svg viewBox="0 0 24 24" style="stroke:var(--amber)"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+          <span class="kpi-trend nt">—</span>
+        </div>
+        <div class="kpi-v" id="k-stars">0</div>
+        <div class="kpi-l">Total Stars</div>
       </div>
-      <div class="kpi" style="--ac:var(--cyan);--ac-dim:var(--cyandim);animation-delay:.15s">
-        <div class="kpi-ico"><svg viewBox="0 0 24 24" style="stroke:var(--cyan)"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M6 9v12"/></svg></div>
-        <div class="kpi-val" id="k-forks">0</div>
-        <div class="kpi-lbl">Forks</div>
-        <div class="kpi-sub">totales</div>
+      <div class="kpi" style="--ac:var(--cyan);--ac-d:var(--cyandim);animation-delay:.12s">
+        <div class="kpi-ac"></div>
+        <div class="kpi-top">
+          <div class="kpi-ico"><svg viewBox="0 0 24 24" style="stroke:var(--cyan)"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M6 9v12"/></svg></div>
+          <span class="kpi-trend nt">—</span>
+        </div>
+        <div class="kpi-v" id="k-forks">0</div>
+        <div class="kpi-l">Forks</div>
       </div>
-      <div class="kpi" style="--ac:var(--red);--ac-dim:var(--reddim);animation-delay:.2s">
-        <div class="kpi-ico"><svg viewBox="0 0 24 24" style="stroke:var(--red)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
-        <div class="kpi-val" id="k-issues">0</div>
-        <div class="kpi-lbl">Issues Abiertos</div>
-        <div class="kpi-sub">pendientes</div>
+      <div class="kpi" style="--ac:var(--red);--ac-d:var(--rdim);animation-delay:.16s">
+        <div class="kpi-ac"></div>
+        <div class="kpi-top">
+          <div class="kpi-ico"><svg viewBox="0 0 24 24" style="stroke:var(--red)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+          <span class="kpi-trend" id="k-iss-trend">—</span>
+        </div>
+        <div class="kpi-v" id="k-issues">0</div>
+        <div class="kpi-l">Issues Abiertos</div>
       </div>
-      <div class="kpi" style="--ac:var(--purple);--ac-dim:var(--purpledim);animation-delay:.25s">
-        <div class="kpi-ico"><svg viewBox="0 0 24 24" style="stroke:var(--purple)"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
-        <div class="kpi-val" id="k-langs">0</div>
-        <div class="kpi-lbl">Lenguajes</div>
-        <div class="kpi-sub">distintos</div>
+      <div class="kpi" style="--ac:var(--purple);--ac-d:var(--pdim);animation-delay:.2s">
+        <div class="kpi-ac"></div>
+        <div class="kpi-top">
+          <div class="kpi-ico"><svg viewBox="0 0 24 24" style="stroke:var(--purple)"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+          <span class="kpi-trend nt">—</span>
+        </div>
+        <div class="kpi-v" id="k-langs">0</div>
+        <div class="kpi-l">Lenguajes</div>
       </div>
-      <div class="kpi" style="--ac:var(--green);--ac-dim:var(--greendim);animation-delay:.3s">
-        <div class="kpi-ico"><svg viewBox="0 0 24 24" style="stroke:var(--green)"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
-        <div class="kpi-val" id="k-commits" style="font-size:22px;padding-top:4px">0</div>
-        <div class="kpi-lbl">Commits Recientes</div>
-        <div class="kpi-sub" id="k-lastpush-repo">—</div>
+      <div class="kpi" style="--ac:var(--green);--ac-d:var(--gdim);animation-delay:.24s">
+        <div class="kpi-ac"></div>
+        <div class="kpi-top">
+          <div class="kpi-ico"><svg viewBox="0 0 24 24" style="stroke:var(--green)"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+          <span class="kpi-trend up" id="k-commits-t">live</span>
+        </div>
+        <div class="kpi-v" id="k-commits">0</div>
+        <div class="kpi-l">Commits Recientes</div>
+      </div>
+      <div class="kpi" style="--ac:var(--teal);--ac-d:var(--tdim);animation-delay:.28s">
+        <div class="kpi-ac"></div>
+        <div class="kpi-top">
+          <div class="kpi-ico"><svg viewBox="0 0 24 24" style="stroke:var(--teal)"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg></div>
+          <span class="kpi-trend nt">—</span>
+        </div>
+        <div class="kpi-v" id="k-size">0</div>
+        <div class="kpi-l">Storage Total</div>
+        <div class="kpi-sub">MB acumulados</div>
       </div>
     </div>
 
-    <!-- CHARTS ROW 1 -->
-    <div class="sec-hd"><div class="sec-lbl">Análisis Visual</div></div>
-    <div class="chart-grid-top" style="margin-bottom:14px">
-      <!-- Commits por repo -->
-      <div class="chart-panel" style="animation-delay:.35s">
-        <div class="chart-hd">
-          <div class="chart-title">
+    <!-- ROW 1: Charts + Spotlight -->
+    <div class="main-grid">
+      <!-- Commits bar -->
+      <div class="pnl" style="animation-delay:.32s">
+        <div class="pnl-hd">
+          <div class="pnl-title">
             <svg viewBox="0 0 24 24"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg>
             Commits por Repositorio
           </div>
-          <div class="chart-badge">últimos 3 por repo</div>
+          <div class="pnl-badge">top 12 activos</div>
         </div>
-        <div class="chart-wrap" style="height:230px"><canvas id="ch-commits"></canvas></div>
+        <div class="cw" style="height:210px"><canvas id="ch-com"></canvas></div>
       </div>
       <!-- Lang donut -->
-      <div class="chart-panel" style="animation-delay:.4s">
-        <div class="chart-hd">
-          <div class="chart-title">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
-            Lenguajes
+      <div class="pnl" style="animation-delay:.36s">
+        <div class="pnl-hd">
+          <div class="pnl-title">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+            Ecosistema de Lenguajes
           </div>
-          <div class="chart-badge" id="lang-count-badge">0 tecnologías</div>
+          <div class="pnl-badge" id="l-badge">0 tecnologías</div>
         </div>
-        <div class="chart-wrap" style="height:230px"><canvas id="ch-langs"></canvas></div>
+        <div class="cw" style="height:210px"><canvas id="ch-lang"></canvas></div>
+      </div>
+      <!-- Top repo spotlight -->
+      <div class="spotlight" id="spotlight">
+        <div class="spot-head">
+          <div style="font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--blue3);margin-bottom:8px">⬡ Repo más activo</div>
+          <div class="spot-name" id="sp-name">—</div>
+          <div class="spot-desc" id="sp-desc">—</div>
+        </div>
+        <div class="spot-stat-grid" id="sp-stats"></div>
+        <div class="spot-bar-wrap" id="sp-bars"></div>
+        <div style="font-size:9px;text-transform:uppercase;letter-spacing:2px;color:var(--t3);margin-bottom:8px">Stack tecnológico</div>
+        <div class="lang-rows" id="sp-langs"></div>
       </div>
     </div>
 
-    <!-- CHARTS ROW 2 -->
-    <div class="chart-grid-mid">
-      <!-- Stars -->
-      <div class="chart-panel" style="animation-delay:.45s">
-        <div class="chart-hd">
-          <div class="chart-title">
+    <!-- ROW 2 -->
+    <div class="main-grid2">
+      <!-- Storage gauge -->
+      <div class="pnl" style="animation-delay:.38s">
+        <div class="pnl-hd">
+          <div class="pnl-title">
+            <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+            Almacenamiento
+          </div>
+        </div>
+        <div class="gauge-wrap" id="storage-wrap"></div>
+      </div>
+      <!-- Stars line -->
+      <div class="pnl" style="animation-delay:.4s">
+        <div class="pnl-hd">
+          <div class="pnl-title">
             <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
             Stars Ranking
           </div>
         </div>
-        <div class="chart-wrap" style="height:190px"><canvas id="ch-stars"></canvas></div>
+        <div class="cw" style="height:200px"><canvas id="ch-stars"></canvas></div>
       </div>
       <!-- Forks -->
-      <div class="chart-panel" style="animation-delay:.5s">
-        <div class="chart-hd">
-          <div class="chart-title">
+      <div class="pnl" style="animation-delay:.42s">
+        <div class="pnl-hd">
+          <div class="pnl-title">
             <svg viewBox="0 0 24 24"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M6 9v12"/></svg>
             Forks por Repo
           </div>
         </div>
-        <div class="chart-wrap" style="height:190px"><canvas id="ch-forks"></canvas></div>
-      </div>
-      <!-- Size -->
-      <div class="chart-panel" style="animation-delay:.55s">
-        <div class="chart-hd">
-          <div class="chart-title">
-            <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
-            Tamaño repos (KB)
-          </div>
-        </div>
-        <div class="chart-wrap" style="height:190px"><canvas id="ch-size"></canvas></div>
+        <div class="cw" style="height:200px"><canvas id="ch-forks"></canvas></div>
       </div>
     </div>
 
-    <!-- TIMELINE -->
-    <div class="sec-hd"><div class="sec-lbl">Línea de Tiempo — Actividad Reciente</div><div class="sec-badge" id="tl-badge">0 eventos</div></div>
-    <div class="timeline-panel" style="animation-delay:.6s">
-      <div class="tl-entries" id="tl-entries">
-        <div style="color:var(--text3);font-size:12px;padding:20px 0;text-align:center">Cargando actividad...</div>
+    <!-- ROW 3: Heatmap + Timeline -->
+    <div class="main-grid" style="grid-template-columns:1fr 1.2fr 1fr;margin-bottom:14px">
+      <!-- Heatmap -->
+      <div class="pnl" style="animation-delay:.44s">
+        <div class="pnl-hd">
+          <div class="pnl-title">
+            <svg viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            Mapa de Actividad (90d)
+          </div>
+        </div>
+        <div class="heatmap-grid" id="heatmap"></div>
+        <div style="display:flex;align-items:center;gap:5px;margin-top:10px;font-size:9px;color:var(--t3)">
+          Menos <div class="hm-cell hm-0" style="width:10px;height:10px"></div>
+          <div class="hm-cell hm-1" style="width:10px;height:10px"></div>
+          <div class="hm-cell hm-2" style="width:10px;height:10px"></div>
+          <div class="hm-cell hm-3" style="width:10px;height:10px"></div>
+          <div class="hm-cell hm-4" style="width:10px;height:10px"></div> Más
+        </div>
+      </div>
+      <!-- Timeline -->
+      <div class="pnl" style="animation-delay:.46s">
+        <div class="pnl-hd">
+          <div class="pnl-title">
+            <svg viewBox="0 0 24 24"><line x1="12" y1="2" x2="12" y2="22"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            Línea de Tiempo
+          </div>
+          <div class="pnl-badge" id="tl-badge">0 eventos</div>
+        </div>
+        <div class="tl" id="tl-list"></div>
+      </div>
+      <!-- Issues donut -->
+      <div class="pnl" style="animation-delay:.48s">
+        <div class="pnl-hd">
+          <div class="pnl-title">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Issues por Repo
+          </div>
+        </div>
+        <div class="cw" style="height:170px"><canvas id="ch-iss"></canvas></div>
+        <div style="margin-top:12px">
+          <div class="cw" style="height:90px"><canvas id="ch-size2"></canvas></div>
+        </div>
+        <div style="font-size:9px;color:var(--t3);text-align:center;margin-top:5px;letter-spacing:1px">TAMAÑO REPOS (KB)</div>
+      </div>
+    </div>
+
+    <!-- ROW 4: Table -->
+    <div class="pnl" style="animation-delay:.5s;margin-bottom:18px">
+      <div class="pnl-hd">
+        <div class="pnl-title">
+          <svg viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          Tabla Completa de Repositorios
+        </div>
+        <div class="pnl-num" id="tbl-count">0 repos</div>
+      </div>
+      <div style="overflow-x:auto">
+        <table class="rtable" id="repo-table">
+          <thead>
+            <tr>
+              <th>#</th><th>Repositorio</th><th>Lenguaje</th>
+              <th>Stars</th><th>Forks</th><th>Issues</th>
+              <th>Tamaño</th><th>Rama</th><th>Último Push</th><th>Link</th>
+            </tr>
+          </thead>
+          <tbody id="tbl-body"></tbody>
+        </table>
       </div>
     </div>
 
     <!-- REPO CARDS -->
-    <div class="sec-hd">
-      <div class="sec-lbl">Repositorios</div>
-      <div class="sec-badge" id="repo-badge">0 repos</div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-size:10px;font-weight:600;letter-spacing:2.5px;text-transform:uppercase;color:var(--t3);display:flex;align-items:center;gap:8px">
+        <span style="width:3px;height:13px;background:var(--blue3);border-radius:2px;display:inline-block"></span>
+        Cards Detalladas
+      </div>
+      <div style="font-size:10px;color:var(--blue3);background:var(--blueg);border:1px solid rgba(41,121,255,.2);padding:2px 10px;border-radius:20px" id="card-badge">0 repos</div>
     </div>
-    <div id="cards-grid"></div>
+    <div class="cards-grid" id="cards-grid"></div>
 
-  </div><!-- /content -->
-</div><!-- /app -->
+  </div>
+</div>
 
 <script>
 const ORG = 'analistadatos-Oikos';
 let ghToken = localStorage.getItem('gh_token') || '';
-let CHARTS = {};
+let CHS = {};
 
 // ── TOKEN ──
-function openTk()  { document.getElementById('tk-input').value = ghToken; document.getElementById('tmodal').classList.add('open'); }
-function closeTk() { document.getElementById('tmodal').classList.remove('open'); }
+function openTk()  { document.getElementById('tk-inp').value=ghToken; document.getElementById('tmod').classList.add('o'); }
+function closeTk() { document.getElementById('tmod').classList.remove('o'); }
 function applyTk() {
-  ghToken = document.getElementById('tk-input').value.trim();
-  ghToken ? localStorage.setItem('gh_token', ghToken) : localStorage.removeItem('gh_token');
+  ghToken = document.getElementById('tk-inp').value.trim();
+  ghToken ? localStorage.setItem('gh_token',ghToken) : localStorage.removeItem('gh_token');
+  document.getElementById('rate-info').textContent = ghToken ? 'API: Token' : 'API: Público';
   closeTk(); refreshAll();
 }
 
 // ── API ──
-function hdrs() {
-  const h = { 'Accept': 'application/vnd.github+json' };
-  if (ghToken) h['Authorization'] = `Bearer ${ghToken}`;
-  return h;
-}
-async function get(url) {
-  const r = await fetch(url, { headers: hdrs() });
-  if (!r.ok) throw new Error(`HTTP ${r.status}`);
-  return r.json();
-}
+function hdrs(){const h={'Accept':'application/vnd.github+json'};if(ghToken)h['Authorization']=`Bearer ${ghToken}`;return h}
+async function api(url){const r=await fetch(url,{headers:hdrs()});if(!r.ok)throw new Error(`HTTP ${r.status}`);return r.json()}
 
 // ── UTILS ──
-function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function ago(d) {
-  if (!d) return '—';
-  const s = (Date.now() - new Date(d)) / 1000;
-  if (s < 60)    return 'ahora mismo';
-  if (s < 3600)  return `hace ${Math.floor(s/60)}m`;
-  if (s < 86400) return `hace ${Math.floor(s/3600)}h`;
-  if (s < 604800)return `hace ${Math.floor(s/86400)}d`;
-  if (s < 2592000) return `hace ${Math.floor(s/604800)} sem`;
-  return `hace ${Math.floor(s/2592000)} mes`;
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function ago(d){
+  if(!d) return '—';
+  const s=(Date.now()-new Date(d))/1000;
+  if(s<60) return 'ahora';
+  if(s<3600) return `${Math.floor(s/60)}m`;
+  if(s<86400) return `${Math.floor(s/3600)}h`;
+  if(s<604800) return `${Math.floor(s/86400)}d`;
+  if(s<2592000) return `${Math.floor(s/604800)}sem`;
+  return `${Math.floor(s/2592000)}mes`;
 }
-function pushCls(d) {
-  const days = d ? (Date.now()-new Date(d))/86400000 : 999;
-  return days < 7 ? 'fresh' : days < 30 ? 'warm' : 'cold';
-}
-function fmtSize(kb) { return kb > 1024 ? (kb/1024).toFixed(1)+'MB' : kb+'KB'; }
+function pCls(d){const days=d?(Date.now()-new Date(d))/86400000:999;return days<7?'fr':days<30?'wm':'cl'}
+function fmtKB(kb){return kb>1024?(kb/1024).toFixed(1)+'MB':kb+'KB'}
 
 // ── LANG PALETTE ──
-const LP = {
-  JavaScript: { bg:'#2a1f08',bd:'#f59e0b',dot:'#f59e0b',tx:'#fbbf24',ch:'rgba(245,158,11,.75)' },
-  Python:     { bg:'#071b38',bd:'#3b82f6',dot:'#3b82f6',tx:'#60a5fa',ch:'rgba(59,130,246,.75)' },
-  HTML:       { bg:'#1f0c04',bd:'#f97316',dot:'#f97316',tx:'#fb923c',ch:'rgba(249,115,22,.75)'  },
-  CSS:        { bg:'#0c0f2a',bd:'#6366f1',dot:'#6366f1',tx:'#818cf8',ch:'rgba(99,102,241,.75)'  },
-  TypeScript: { bg:'#040f2a',bd:'#2563eb',dot:'#2563eb',tx:'#93c5fd',ch:'rgba(37,99,235,.75)'   },
-  Shell:      { bg:'#031510',bd:'#10b981',dot:'#10b981',tx:'#34d399',ch:'rgba(16,185,129,.75)'  },
-  Dockerfile: { bg:'#021525',bd:'#06b6d4',dot:'#06b6d4',tx:'#22d3ee',ch:'rgba(6,182,212,.75)'  },
-  Vue:        { bg:'#062018',bd:'#42b883',dot:'#42b883',tx:'#6ee7b7',ch:'rgba(66,184,131,.75)'  },
-  default:    { bg:'#111827',bd:'#4a5568',dot:'#94a3b8',tx:'#94a3b8',ch:'rgba(148,163,184,.75)' },
+const LP={
+  JavaScript:{bg:'#2a1f08',bd:'#f59e0b',dot:'#f59e0b',tx:'#fbbf24',ch:'rgba(245,158,11,.8)'},
+  Python:    {bg:'#071830',bd:'#3b82f6',dot:'#3b82f6',tx:'#60a5fa',ch:'rgba(59,130,246,.8)'},
+  HTML:      {bg:'#200c04',bd:'#f97316',dot:'#f97316',tx:'#fb923c',ch:'rgba(249,115,22,.8)'},
+  CSS:       {bg:'#0d1030',bd:'#6366f1',dot:'#6366f1',tx:'#818cf8',ch:'rgba(99,102,241,.8)'},
+  TypeScript:{bg:'#040e2a',bd:'#2563eb',dot:'#2563eb',tx:'#93c5fd',ch:'rgba(37,99,235,.8)'},
+  Shell:     {bg:'#031612',bd:'#10b981',dot:'#10b981',tx:'#34d399',ch:'rgba(16,185,129,.8)'},
+  Dockerfile:{bg:'#021628',bd:'#06b6d4',dot:'#06b6d4',tx:'#22d3ee',ch:'rgba(6,182,212,.8)'},
+  Vue:       {bg:'#062018',bd:'#42b883',dot:'#42b883',tx:'#6ee7b7',ch:'rgba(66,184,131,.8)'},
+  default:   {bg:'#111827',bd:'#4a5568',dot:'#94a3b8',tx:'#94a3b8',ch:'rgba(148,163,184,.8)'},
 };
-function lp(lang) { return LP[lang] || LP.default; }
+function lp(l){return LP[l]||LP.default}
 
-// ── CHART DEFAULTS ──
-const CD = {
-  responsive:true, maintainAspectRatio:false,
-  plugins:{ legend:{ display:false } },
+// ── CHART CFG ──
+const CD={
+  responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{display:false},tooltip:{backgroundColor:'#0f1a30',borderColor:'#1d2d50',borderWidth:1,titleColor:'#e8f0ff',bodyColor:'#8899bb',padding:10}},
   scales:{
-    x:{ ticks:{ color:'#4a5568', font:{ family:'Inter', size:9 }, maxRotation:35 }, grid:{ color:'#1a2340' }, border:{ color:'#1a2340' } },
-    y:{ ticks:{ color:'#4a5568', font:{ family:'Inter', size:9 } }, grid:{ color:'#1a2340' }, border:{ color:'#1a2340' } }
+    x:{ticks:{color:'#3d5070',font:{family:'Inter',size:8},maxRotation:35},grid:{color:'#162040'},border:{color:'#162040'}},
+    y:{ticks:{color:'#3d5070',font:{family:'Inter',size:8}},grid:{color:'#162040'},border:{color:'#162040'}}
   }
 };
+function nukeChs(){Object.values(CHS).forEach(c=>c.destroy());CHS={}}
 
-function nukecharts() { Object.values(CHARTS).forEach(c=>c.destroy()); CHARTS={}; }
-
-function drawCharts(repos, allCommits) {
-  nukecharts();
-  const top = [...repos].sort((a,b)=>new Date(b.pushed_at)-new Date(a.pushed_at)).slice(0,12);
-  const short = r => r.name.slice(0,14);
-
-  // Commits
-  CHARTS.commits = new Chart(document.getElementById('ch-commits'), {
-    type:'bar',
-    data:{
-      labels: top.map(short),
-      datasets:[{ data: top.map(r=>(allCommits[r.name]||[]).length),
-        backgroundColor: top.map(r=>lp(r.language).ch),
-        borderColor: top.map(r=>lp(r.language).bd),
-        borderWidth:1, borderRadius:6, borderSkipped:false }]
-    },
-    options:{ ...CD }
+// ── HEATMAP ──
+function buildHeatmap(repos, allCommits) {
+  const days=90;
+  const counts={};
+  const now=Date.now();
+  Object.values(allCommits).flat().forEach(c=>{
+    const d=new Date(c.date);
+    const key=`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    counts[key]=(counts[key]||0)+1;
   });
-
-  // Lang donut
-  const lc={};
-  repos.forEach(r=>{ if(r.language) lc[r.language]=(lc[r.language]||0)+1; });
-  const lkeys = Object.keys(lc).sort((a,b)=>lc[b]-lc[a]);
-  document.getElementById('lang-count-badge').textContent = lkeys.length+' tecnologías';
-  CHARTS.langs = new Chart(document.getElementById('ch-langs'), {
-    type:'doughnut',
-    data:{
-      labels:lkeys,
-      datasets:[{ data:lkeys.map(l=>lc[l]),
-        backgroundColor:lkeys.map(l=>lp(l).ch),
-        borderColor:lkeys.map(l=>lp(l).bd),
-        borderWidth:2, hoverOffset:6 }]
-    },
-    options:{
-      responsive:true, maintainAspectRatio:false, cutout:'60%',
-      plugins:{
-        legend:{
-          display:true, position:'bottom',
-          labels:{ color:'#4a5568', font:{family:'Inter',size:9}, boxWidth:8, padding:10, usePointStyle:true }
-        }
-      }
+  const cells=[];
+  for(let i=days-1;i>=0;i--){
+    const d=new Date(now-i*86400000);
+    const key=`${d.getFullYear()}-${d.getMonth()}-${d.getDate()}`;
+    cells.push(counts[key]||0);
+  }
+  const max=Math.max(...cells,1);
+  const cols=13; // ~13 weeks
+  const rows=Math.ceil(days/cols);
+  let html='';
+  for(let r=0;r<rows;r++){
+    html+='<div class="heatmap-row">';
+    for(let c=0;c<cols;c++){
+      const idx=r*cols+c;
+      if(idx>=cells.length){html+='<div class="hm-cell hm-0"></div>';continue}
+      const v=cells[idx];
+      const lvl=v===0?0:v<2?1:v<4?2:v<7?3:4;
+      const pct=v>0?Math.round((v/max)*100):0;
+      html+=`<div class="hm-cell hm-${lvl}" title="${v} commits (${pct}% del máximo)"></div>`;
     }
-  });
+    html+='</div>';
+  }
+  document.getElementById('heatmap').innerHTML=html;
+}
 
-  // Stars
-  const byStars = [...repos].sort((a,b)=>b.stargazers_count-a.stargazers_count).slice(0,10);
-  CHARTS.stars = new Chart(document.getElementById('ch-stars'),{
-    type:'bar',
-    data:{
-      labels:byStars.map(short),
-      datasets:[{ data:byStars.map(r=>r.stargazers_count),
-        backgroundColor:'rgba(245,158,11,.7)', borderColor:'#f59e0b',
-        borderWidth:1, borderRadius:5 }]
-    }, options:{...CD}
-  });
+// ── STORAGE GAUGE ──
+function buildStorage(repos){
+  const totalKB=repos.reduce((a,r)=>a+r.size,0);
+  const totalMB=(totalKB/1024).toFixed(1);
+  const pct=Math.min(Math.round((totalKB/(1024*500))*100),100); // vs 500MB reference
+  const r=55,cx=80,cy=70,strokeW=10;
+  const circ=2*Math.PI*r;
+  const dash=circ*(pct/100);
 
-  // Forks — horizontal
-  const byForks = [...repos].sort((a,b)=>b.forks_count-a.forks_count).slice(0,10);
-  CHARTS.forks = new Chart(document.getElementById('ch-forks'),{
-    type:'bar',
-    data:{
-      labels:byForks.map(short),
-      datasets:[{ data:byForks.map(r=>r.forks_count),
-        backgroundColor:'rgba(6,182,212,.7)', borderColor:'#06b6d4',
-        borderWidth:1, borderRadius:5 }]
-    }, options:{...CD, indexAxis:'y',
-      scales:{
-        x:{ ticks:{color:'#4a5568',font:{family:'Inter',size:9}}, grid:{color:'#1a2340'}, border:{color:'#1a2340'} },
-        y:{ ticks:{color:'#4a5568',font:{family:'Inter',size:9}}, grid:{color:'#1a2340'}, border:{color:'#1a2340'} }
-      }
-    }
-  });
+  const sorted=[...repos].sort((a,b)=>b.size-a.size).slice(0,5);
+  const mx=sorted[0]?.size||1;
+  const colors=['#2979ff','#00e5ff','#1de9b6','#e040fb','#ffab00'];
 
-  // Size line
-  const bySize = [...repos].sort((a,b)=>b.size-a.size).slice(0,10);
-  CHARTS.size = new Chart(document.getElementById('ch-size'),{
-    type:'line',
-    data:{
-      labels:bySize.map(short),
-      datasets:[{
-        data:bySize.map(r=>r.size),
-        borderColor:'#8b5cf6', backgroundColor:'rgba(139,92,246,.1)',
-        borderWidth:2, pointBackgroundColor:'#8b5cf6',
-        pointRadius:4, fill:true, tension:.35
-      }]
-    }, options:{...CD}
-  });
+  document.getElementById('storage-wrap').innerHTML=`
+    <svg class="gauge-svg" width="160" height="100" viewBox="0 0 160 100">
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#162040" stroke-width="${strokeW}"/>
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="url(#gg)" stroke-width="${strokeW}"
+        stroke-dasharray="${dash} ${circ}" stroke-dashoffset="${circ*0.25}"
+        stroke-linecap="round" transform="rotate(-90 ${cx} ${cy})"/>
+      <defs><linearGradient id="gg" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" stop-color="#2563eb"/><stop offset="100%" stop-color="#00e5ff"/>
+      </linearGradient></defs>
+      <text x="${cx}" y="${cy+6}" class="gauge-val">${totalMB}</text>
+      <text x="${cx}" y="${cy+20}" class="gauge-lbl2">MB totales</text>
+    </svg>
+    <div class="storage-items">
+      ${sorted.map((r,i)=>`
+        <div class="si">
+          <div class="si-dot" style="background:${colors[i]}"></div>
+          <div class="si-lbl">${esc(r.name.slice(0,18))}</div>
+          <div class="si-bar"><div class="si-fill" style="width:${Math.round((r.size/mx)*100)}%;background:${colors[i]}"></div></div>
+          <div class="si-val">${fmtKB(r.size)}</div>
+        </div>`).join('')}
+    </div>`;
 }
 
 // ── TIMELINE ──
-async function buildTimeline(repos, allCommits) {
-  const events = [];
-  repos.forEach(repo => {
-    const commits = allCommits[repo.name] || [];
-    commits.forEach(c => {
-      events.push({
-        type:'commit', repo:repo.name, msg:c.message,
-        date:c.date, hash:c.sha, lang:repo.language,
-        url:repo.html_url
-      });
-    });
+function buildTimeline(allCommits){
+  const events=[];
+  Object.entries(allCommits).forEach(([repo,commits])=>{
+    commits.forEach(c=>events.push({repo,sha:c.sha,msg:c.message,date:c.date,lang:c.lang}));
   });
-  events.sort((a,b) => new Date(b.date)-new Date(a.date));
-  const top = events.slice(0,20);
-  document.getElementById('tl-badge').textContent = `${top.length} eventos`;
-
-  const html = top.map((e,i) => {
-    const pc = pushCls(e.date);
-    const s = lp(e.lang);
-    return `
-      <div class="tl-entry">
-        <div class="tl-left">
-          <div class="tl-time">${ago(e.date)}</div>
-          <div class="tl-line"></div>
+  events.sort((a,b)=>new Date(b.date)-new Date(a.date));
+  const top=events.slice(0,25);
+  document.getElementById('tl-badge').textContent=`${top.length} eventos`;
+  const s=lp;
+  document.getElementById('tl-list').innerHTML=top.map(e=>{
+    const pc=pCls(e.date), ls=s(e.lang);
+    return `<div class="tl-item">
+      <div class="tl-left"><div class="tl-t">${ago(e.date)}</div><div class="tl-vl"></div></div>
+      <div style="padding-top:14px"><div class="tl-dot2 ${pc}"></div></div>
+      <div class="tl-body">
+        <div class="tl-repo">${esc(e.repo)}</div>
+        <div class="tl-msg">${esc(e.msg)}</div>
+        <div class="tl-tags">
+          <span class="tg c">commit</span>
+          ${e.lang?`<span class="tg l" style="background:${ls.bg};border-color:${ls.bd};color:${ls.tx}">${e.lang}</span>`:''}
         </div>
-        <div style="display:flex;align-items:center;padding:2px 0;flex-shrink:0">
-          <div class="tl-dot ${pc}"></div>
-        </div>
-        <div class="tl-body" style="padding-left:12px">
-          <div class="tl-repo">${esc(e.repo)}</div>
-          <div class="tl-msg">${esc(e.msg)}</div>
-          <div class="tl-meta">
-            <span class="tl-tag commit">
-              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg>
-              commit
-            </span>
-            ${e.lang ? `<span class="tl-tag lang" style="background:${s.bg};border-color:${s.bd};color:${s.tx}">${e.lang}</span>` : ''}
-          </div>
-        </div>
-        <div class="tl-right">
-          <div class="tl-hash">${e.hash}</div>
-        </div>
-      </div>`;
-  }).join('');
-  document.getElementById('tl-entries').innerHTML = html || '<div style="color:var(--text3);font-size:12px;padding:20px 0;text-align:center">Sin actividad reciente</div>';
+      </div>
+      <div class="tl-hash">${e.sha}</div>
+    </div>`;
+  }).join('')||'<div style="color:var(--t3);font-size:12px;padding:20px;text-align:center">Sin actividad</div>';
 }
 
-// ── HEALTH BAR ──
-function healthBar(label, val, max, color) {
-  const pct = max > 0 ? Math.round((val/max)*100) : 0;
-  return `<div class="health-row">
-    <div class="health-lbl">${label}</div>
-    <div class="health-bar"><div class="health-fill" style="width:${pct}%;background:${color}"></div></div>
-    <div class="health-val">${val}</div>
-  </div>`;
+// ── SPOTLIGHT ──
+function buildSpotlight(repos, allCommits){
+  const sorted=[...repos].sort((a,b)=>new Date(b.pushed_at)-new Date(a.pushed_at));
+  const top=sorted[0]; if(!top) return;
+  document.getElementById('sp-name').textContent=top.name;
+  document.getElementById('sp-desc').textContent=top.description||'Sin descripción';
+  const maxS=Math.max(...repos.map(r=>r.stargazers_count),1);
+  const maxF=Math.max(...repos.map(r=>r.forks_count),1);
+  document.getElementById('sp-stats').innerHTML=`
+    <div class="spot-stat"><div class="spot-stat-v">${top.stargazers_count}</div><div class="spot-stat-l">Stars</div></div>
+    <div class="spot-stat"><div class="spot-stat-v">${top.forks_count}</div><div class="spot-stat-l">Forks</div></div>
+    <div class="spot-stat"><div class="spot-stat-v">${top.open_issues_count}</div><div class="spot-stat-l">Issues</div></div>
+    <div class="spot-stat"><div class="spot-stat-v">${fmtKB(top.size)}</div><div class="spot-stat-l">Tamaño</div></div>`;
+  document.getElementById('sp-bars').innerHTML=`
+    <div class="spot-bar-lbl"><span>Stars vs máximo</span><span>${top.stargazers_count}/${maxS}</span></div>
+    <div class="bar-track"><div class="bar-fill" style="width:${Math.round((top.stargazers_count/maxS)*100)}%;background:linear-gradient(90deg,#f59e0b,#fbbf24)"></div></div>
+    <br>
+    <div class="spot-bar-lbl"><span>Commits recientes</span><span>${(allCommits[top.name]||[]).length}</span></div>
+    <div class="bar-track"><div class="bar-fill" style="width:${Math.min(Math.round(((allCommits[top.name]||[]).length/5)*100),100)}%;background:linear-gradient(90deg,#2979ff,#00e5ff)"></div></div>`;
+  const lc={};
+  repos.forEach(r=>{if(r.language)lc[r.language]=(lc[r.language]||0)+1});
+  const lkeys=Object.keys(lc).sort((a,b)=>lc[b]-lc[a]).slice(0,5);
+  const maxLc=lc[lkeys[0]]||1;
+  const colors=['#2979ff','#00e5ff','#1de9b6','#e040fb','#ffab00'];
+  document.getElementById('sp-langs').innerHTML=lkeys.map((l,i)=>{
+    const s=lp(l);
+    return `<div class="lang-row">
+      <div class="lang-dot" style="background:${s.dot}"></div>
+      <div class="lang-name">${l}</div>
+      <div class="lang-track"><div class="lang-fill" style="width:${Math.round((lc[l]/maxLc)*100)}%;background:${colors[i]}"></div></div>
+      <div class="lang-pct">${lc[l]} repos</div>
+    </div>`;}).join('');
+}
+
+// ── TABLE ──
+function buildTable(repos){
+  document.getElementById('tbl-count').textContent=`${repos.length} repos`;
+  const sorted=[...repos].sort((a,b)=>new Date(b.pushed_at)-new Date(a.pushed_at));
+  document.getElementById('tbl-body').innerHTML=sorted.map((r,i)=>{
+    const s=lp(r.language), pc=pCls(r.pushed_at);
+    return `<tr>
+      <td style="color:var(--t3)">${i+1}</td>
+      <td><div class="rname">${esc(r.name)}</div></td>
+      <td>${r.language?`<span class="badge-lang" style="background:${s.bg};border-color:${s.bd};color:${s.tx}">${r.language}</span>`:'—'}</td>
+      <td class="val-b">${r.stargazers_count}</td>
+      <td class="val-b">${r.forks_count}</td>
+      <td class="${r.open_issues_count>0?'val-r':'val-g'}">${r.open_issues_count}</td>
+      <td>${fmtKB(r.size)}</td>
+      <td style="color:var(--t2)">${esc(r.default_branch)}</td>
+      <td><span class="push-tag ${pc}">${ago(r.pushed_at)}</span></td>
+      <td><a href="${r.html_url}" target="_blank" class="gh-a">↗</a></td>
+    </tr>`;}).join('');
 }
 
 // ── CARD ──
-function buildCard(repo, commits, maxStars, maxForks, idx) {
-  const s = lp(repo.language);
-  const pc = pushCls(repo.pushed_at);
-  const accentGrad = pc==='fresh'
-    ? 'linear-gradient(90deg,var(--green),var(--cyan),transparent)'
-    : pc==='warm'
-    ? 'linear-gradient(90deg,var(--amber),transparent)'
-    : 'linear-gradient(90deg,var(--border2),transparent)';
-
-  const chipHtml = repo.language
-    ? `<span class="lchip" style="background:${s.bg};border-color:${s.bd};color:${s.tx}"><span class="ldot" style="background:${s.dot}"></span>${repo.language}</span>`
-    : '';
-
-  const cRows = commits.slice(0,3).map(c=>`
-    <div class="c-row">
-      <span class="c-hash">${c.sha}</span>
-      <span class="c-msg">${esc(c.message)}</span>
-      <span class="c-time">${ago(c.date)}</span>
-    </div>`).join('') || `<div class="c-row"><span class="c-msg" style="color:var(--text3)">Sin commits recientes</span></div>`;
-
-  return `
-  <div class="repo-card" style="animation-delay:${.04*idx}s">
-    <div class="card-top-bar" style="background:${accentGrad}"></div>
-    <div class="card-inner">
-      <div class="card-hd">
-        <div class="card-hd-icon">
-          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
-        </div>
+function buildCard(repo, commits, mxS, mxF, idx){
+  const s=lp(repo.language), pc=pCls(repo.pushed_at);
+  const acGrad=pc==='fr'?'linear-gradient(90deg,var(--green),var(--cyan),transparent)':
+               pc==='wm'?'linear-gradient(90deg,var(--amber),transparent)':'linear-gradient(90deg,var(--bord2),transparent)';
+  const chip=repo.language?`<span class="lchip" style="background:${s.bg};border-color:${s.bd};color:${s.tx}"><span class="ldot2" style="background:${s.dot}"></span>${repo.language}</span>`:'';
+  const cRows=commits.slice(0,3).map(c=>`<div class="cc"><span class="cc-h">${c.sha}</span><span class="cc-m">${esc(c.message)}</span><span class="cc-t">${ago(c.date)}</span></div>`).join('')
+    ||`<div class="cc"><span class="cc-m" style="color:var(--t3)">Sin commits</span></div>`;
+  return `<div class="rcard" style="animation-delay:${.035*idx}s">
+    <div class="rcard-accent" style="background:${acGrad}"></div>
+    <div class="rcard-body">
+      <div class="rc-hd">
+        <div class="rc-ico"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
         <div style="flex:1;min-width:0">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
-            <div class="card-name">${esc(repo.name)}</div>
-            ${chipHtml}
+          <div style="display:flex;align-items:center;gap:7px;margin-bottom:3px">
+            <div class="rc-name">${esc(repo.name)}</div>${chip}
           </div>
-          <div class="card-desc">${esc(repo.description||'Sin descripción')}</div>
+          <div class="rc-desc">${esc(repo.description||'Sin descripción')}</div>
         </div>
       </div>
-
-      <div class="card-stats">
-        <div class="cs">
-          <div class="cs-ico"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-          <div class="cs-v">${repo.stargazers_count}</div><div class="cs-l">Stars</div>
-        </div>
-        <div class="cs">
-          <div class="cs-ico"><svg viewBox="0 0 24 24"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M6 9v12"/></svg></div>
-          <div class="cs-v">${repo.forks_count}</div><div class="cs-l">Forks</div>
-        </div>
-        <div class="cs">
-          <div class="cs-ico"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
-          <div class="cs-v">${repo.watchers_count}</div><div class="cs-l">Watch</div>
-        </div>
-        <div class="cs">
-          <div class="cs-ico"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
-          <div class="cs-v">${fmtSize(repo.size)}</div><div class="cs-l">Tamaño</div>
-        </div>
+      <div class="rc-stats">
+        <div class="rcs"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg><div class="rcs-v">${repo.stargazers_count}</div><div class="rcs-l">Stars</div></div>
+        <div class="rcs"><svg viewBox="0 0 24 24"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M6 9v12"/></svg><div class="rcs-v">${repo.forks_count}</div><div class="rcs-l">Forks</div></div>
+        <div class="rcs"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><div class="rcs-v">${repo.watchers_count}</div><div class="rcs-l">Watch</div></div>
+        <div class="rcs"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg><div class="rcs-v">${fmtKB(repo.size)}</div><div class="rcs-l">Size</div></div>
       </div>
-
-      <div class="card-health">
-        ${healthBar('Stars',  repo.stargazers_count, maxStars, 'var(--amber)')}
-        ${healthBar('Forks',  repo.forks_count,      maxForks, 'var(--cyan)')}
-        ${healthBar('Issues', repo.open_issues_count, Math.max(repo.open_issues_count,5), 'var(--red)')}
+      <div class="rc-health">
+        ${[['Stars',repo.stargazers_count,mxS,'var(--amber)'],['Forks',repo.forks_count,mxF,'var(--cyan)'],['Issues',repo.open_issues_count,Math.max(repo.open_issues_count,1),'var(--red)']].map(([l,v,m,c])=>`
+        <div class="rch-row"><div class="rch-l">${l}</div><div class="rch-bar"><div class="rch-fill" style="width:${m>0?Math.round((v/m)*100):0}%;background:${c}"></div></div><div class="rch-v">${v}</div></div>`).join('')}
       </div>
-
-      <div class="card-issues">
-        <div class="iss open">
-          <div style="display:flex;align-items:center;gap:5px">
-            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            Issues
-          </div>
-          <span class="iss-num">${repo.open_issues_count}</span>
-        </div>
-        <div class="iss branch">
-          <div style="display:flex;align-items:center;gap:5px">
-            <svg viewBox="0 0 24 24"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
-            Rama
-          </div>
-          <span style="font-size:11px;font-weight:700">${esc(repo.default_branch)}</span>
-        </div>
-      </div>
-
-      <div>
-        <div class="card-commits-lbl">Commits recientes</div>
-        ${cRows}
-      </div>
-
-      <div class="card-foot">
-        <div class="push-ind">
-          <div class="pdot ${pc}"></div>
-          Push ${ago(repo.pushed_at)}
-        </div>
-        <a class="gh-link" href="${repo.html_url}" target="_blank" rel="noopener">
-          Ver en GitHub
-          <svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
-        </a>
+      <div class="rc-commits"><div class="rc-clbl">Commits recientes</div>${cRows}</div>
+      <div class="rc-foot">
+        <div class="push-ind2"><div class="pd ${pc}"></div>Push ${ago(repo.pushed_at)}</div>
+        <a class="gh-a" href="${repo.html_url}" target="_blank" rel="noopener">Ver en GitHub<svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg></a>
       </div>
     </div>
   </div>`;
 }
 
-// ── TOAST ──
-function toast(msg, dur=7000) {
-  const t = document.getElementById('toast');
-  t.textContent = msg; t.style.display='block';
-  setTimeout(()=>t.style.display='none', dur);
+// ── CHARTS ──
+function drawCharts(repos, allCommits){
+  nukeChs();
+  const sorted=[...repos].sort((a,b)=>new Date(b.pushed_at)-new Date(a.pushed_at)).slice(0,12);
+  const sh=r=>r.name.slice(0,14);
+
+  // Commits bar
+  CHS.com=new Chart(document.getElementById('ch-com'),{type:'bar',data:{
+    labels:sorted.map(sh),
+    datasets:[{data:sorted.map(r=>(allCommits[r.name]||[]).length),
+      backgroundColor:sorted.map(r=>lp(r.language).ch),
+      borderColor:sorted.map(r=>lp(r.language).bd),
+      borderWidth:1,borderRadius:6}]
+  },options:{...CD}});
+
+  // Lang donut
+  const lc={};repos.forEach(r=>{if(r.language)lc[r.language]=(lc[r.language]||0)+1});
+  const lk=Object.keys(lc).sort((a,b)=>lc[b]-lc[a]);
+  document.getElementById('l-badge').textContent=lk.length+' tecnologías';
+  CHS.lang=new Chart(document.getElementById('ch-lang'),{type:'doughnut',data:{
+    labels:lk,
+    datasets:[{data:lk.map(l=>lc[l]),backgroundColor:lk.map(l=>lp(l).ch),borderColor:lk.map(l=>lp(l).bd),borderWidth:2,hoverOffset:8}]
+  },options:{responsive:true,maintainAspectRatio:false,cutout:'58%',
+    plugins:{legend:{display:true,position:'right',labels:{color:'#3d5070',font:{family:'Inter',size:9},boxWidth:8,padding:8,usePointStyle:true}},
+      tooltip:{backgroundColor:'#0f1a30',borderColor:'#1d2d50',borderWidth:1,titleColor:'#e8f0ff',bodyColor:'#8899bb',padding:10}}}});
+
+  // Stars
+  const byS=[...repos].sort((a,b)=>b.stargazers_count-a.stargazers_count).slice(0,10);
+  CHS.stars=new Chart(document.getElementById('ch-stars'),{type:'bar',data:{
+    labels:byS.map(sh),
+    datasets:[{data:byS.map(r=>r.stargazers_count),backgroundColor:'rgba(245,158,11,.7)',borderColor:'#f59e0b',borderWidth:1,borderRadius:5}]
+  },options:{...CD}});
+
+  // Forks horizontal
+  const byF=[...repos].sort((a,b)=>b.forks_count-a.forks_count).slice(0,10);
+  CHS.forks=new Chart(document.getElementById('ch-forks'),{type:'bar',data:{
+    labels:byF.map(sh),
+    datasets:[{data:byF.map(r=>r.forks_count),backgroundColor:'rgba(6,182,212,.7)',borderColor:'#06b6d4',borderWidth:1,borderRadius:5}]
+  },options:{...CD,indexAxis:'y',scales:{x:{...CD.scales.x},y:{...CD.scales.y}}}});
+
+  // Issues donut
+  const withIss=[...repos].filter(r=>r.open_issues_count>0).sort((a,b)=>b.open_issues_count-a.open_issues_count).slice(0,8);
+  CHS.iss=new Chart(document.getElementById('ch-iss'),{type:'doughnut',data:{
+    labels:withIss.map(sh),
+    datasets:[{data:withIss.map(r=>r.open_issues_count),backgroundColor:withIss.map((_,i)=>`hsla(${220+i*30},80%,60%,.75)`),borderWidth:1,hoverOffset:6}]
+  },options:{responsive:true,maintainAspectRatio:false,cutout:'55%',
+    plugins:{legend:{display:false},tooltip:{backgroundColor:'#0f1a30',borderColor:'#1d2d50',borderWidth:1,titleColor:'#e8f0ff',bodyColor:'#8899bb',padding:10}}}});
+
+  // Size line
+  const byZ=[...repos].sort((a,b)=>b.size-a.size).slice(0,10);
+  CHS.sz=new Chart(document.getElementById('ch-size2'),{type:'line',data:{
+    labels:byZ.map(sh),
+    datasets:[{data:byZ.map(r=>r.size),borderColor:'#8b5cf6',backgroundColor:'rgba(139,92,246,.08)',
+      borderWidth:2,pointBackgroundColor:'#8b5cf6',pointRadius:3,fill:true,tension:.4}]
+  },options:{...CD}});
 }
 
-// ── FETCH COMMITS ──
-async function getCommits(name) {
-  try {
-    const data = await get(`https://api.github.com/repos/${ORG}/${name}/commits?per_page=5`);
-    return data.map(c=>({ sha:c.sha.slice(0,7), message:c.commit.message.split('\n')[0].slice(0,65), date:c.commit.author.date }));
-  } catch { return []; }
-}
-
-// ── MAIN ──
-async function loadAll() {
-  document.getElementById('content').style.display='none';
-  document.getElementById('loader').style.display='flex';
-  document.getElementById('btn-refresh').classList.add('spinning');
-  setStatus('Conectando con GitHub API...');
+// ── MAIN LOAD ──
+async function loadAll(){
+  document.getElementById('cnt').style.display='none';
+  document.getElementById('ldr').style.display='flex';
+  document.getElementById('btn-ref').classList.add('sp');
+  document.getElementById('rate-info').textContent=ghToken?'API: Token ✓':'API: Público';
+  setSt('Conectando con GitHub API...');
 
   try {
-    setStatus('Cargando repositorios...');
-    let repos=[], tried=false;
-    for (const base of [`https://api.github.com/orgs/${ORG}/repos`, `https://api.github.com/users/${ORG}/repos`]) {
-      try {
+    setSt('Cargando repositorios...');
+    let repos=[];
+    for(const base of [`https://api.github.com/orgs/${ORG}/repos`,`https://api.github.com/users/${ORG}/repos`]){
+      try{
         let p=1;
-        while(true) {
-          const b = await get(`${base}?type=public&per_page=100&page=${p}&sort=pushed`);
-          repos=repos.concat(b); if(b.length<100) break; p++;
+        while(true){
+          const b=await api(`${base}?type=public&per_page=100&page=${p}&sort=pushed`);
+          repos=repos.concat(b);if(b.length<100)break;p++;
         }
-        if(repos.length) break;
-      } catch { repos=[]; }
+        if(repos.length)break;
+      }catch{repos=[];}
     }
-    if(!repos.length) throw new Error('No se encontraron repositorios públicos.');
+    if(!repos.length)throw new Error('No se encontraron repositorios públicos.');
 
-    // KPIs basicos
-    const totalStars  = repos.reduce((a,r)=>a+r.stargazers_count,0);
-    const totalForks  = repos.reduce((a,r)=>a+r.forks_count,0);
-    const totalIssues = repos.reduce((a,r)=>a+r.open_issues_count,0);
-    const langs = [...new Set(repos.map(r=>r.language).filter(Boolean))];
-    const sorted = [...repos].sort((a,b)=>new Date(b.pushed_at)-new Date(a.pushed_at));
+    // Basic KPIs
+    const tS=repos.reduce((a,r)=>a+r.stargazers_count,0);
+    const tF=repos.reduce((a,r)=>a+r.forks_count,0);
+    const tI=repos.reduce((a,r)=>a+r.open_issues_count,0);
+    const tZ=(repos.reduce((a,r)=>a+r.size,0)/1024).toFixed(1);
+    const langs=[...new Set(repos.map(r=>r.language).filter(Boolean))];
+    const sorted=[...repos].sort((a,b)=>new Date(b.pushed_at)-new Date(a.pushed_at));
 
-    document.getElementById('k-repos').textContent  = repos.length;
-    document.getElementById('k-stars').textContent  = totalStars;
-    document.getElementById('k-forks').textContent  = totalForks;
-    document.getElementById('k-issues').textContent = totalIssues;
-    document.getElementById('k-langs').textContent  = langs.length;
-    document.getElementById('repo-badge').textContent = `${repos.length} repos`;
-    document.getElementById('tb-time').textContent  = `Actualizado ${new Date().toLocaleTimeString('es-CO')}`;
+    document.getElementById('k-repos').textContent=repos.length;
+    document.getElementById('k-stars').textContent=tS;
+    document.getElementById('k-forks').textContent=tF;
+    document.getElementById('k-issues').textContent=tI;
+    document.getElementById('k-langs').textContent=langs.length;
+    document.getElementById('k-size').textContent=tZ;
+    document.getElementById('k-iss-trend').className='kpi-trend '+(tI>0?'dn':'up');
+    document.getElementById('k-iss-trend').textContent=tI>0?`${tI} open`:'✓ clean';
+    document.getElementById('card-badge').textContent=`${repos.length} repos`;
+    document.getElementById('top-time').textContent=new Date().toLocaleTimeString('es-CO');
 
     // Commits
-    setStatus('Cargando historial de commits...');
-    const allCommits = {};
-    const CHUNK = 4;
-    for(let i=0; i<repos.length; i+=CHUNK) {
-      const chunk = repos.slice(i, i+CHUNK);
-      const res = await Promise.all(chunk.map(r=>getCommits(r.name)));
+    setSt('Cargando historial de commits...');
+    const allCommits={};
+    const CHUNK=4;
+    for(let i=0;i<repos.length;i+=CHUNK){
+      const chunk=repos.slice(i,i+CHUNK);
+      const res=await Promise.all(chunk.map(r=>getCommits(r.name,r.language)));
       chunk.forEach((r,j)=>allCommits[r.name]=res[j]);
-      setStatus(`Commits: ${Math.min(i+CHUNK,repos.length)}/${repos.length} repos`);
+      setSt(`Commits: ${Math.min(i+CHUNK,repos.length)}/${repos.length}`);
     }
+    const tC=Object.values(allCommits).reduce((a,c)=>a+c.length,0);
+    document.getElementById('k-commits').textContent=tC;
+    document.getElementById('k-commits-t').textContent=`${tC} total`;
 
-    const totalCommits = Object.values(allCommits).reduce((a,c)=>a+c.length,0);
-    document.getElementById('k-commits').textContent = totalCommits;
-    document.getElementById('k-lastpush-repo').textContent = sorted[0]?.name || '—';
-
-    // Charts
+    // Build everything
+    setSt('Renderizando dashboard...');
     drawCharts(repos, allCommits);
+    buildHeatmap(repos, allCommits);
+    buildStorage(repos);
+    buildTimeline(allCommits);
+    buildSpotlight(repos, allCommits);
+    buildTable(repos);
 
-    // Timeline
-    await buildTimeline(repos, allCommits);
-
-    // Cards
-    const maxStars = Math.max(...repos.map(r=>r.stargazers_count),1);
-    const maxForks = Math.max(...repos.map(r=>r.forks_count),1);
-    const grid = document.getElementById('cards-grid');
+    const mxS=Math.max(...repos.map(r=>r.stargazers_count),1);
+    const mxF=Math.max(...repos.map(r=>r.forks_count),1);
+    const grid=document.getElementById('cards-grid');
     grid.innerHTML='';
-    sorted.forEach((r,i) => grid.insertAdjacentHTML('beforeend', buildCard(r, allCommits[r.name]||[], maxStars, maxForks, i)));
+    sorted.forEach((r,i)=>grid.insertAdjacentHTML('beforeend',buildCard(r,allCommits[r.name]||[],mxS,mxF,i)));
 
-    document.getElementById('loader').style.display='none';
-    document.getElementById('content').style.display='block';
+    document.getElementById('ldr').style.display='none';
+    document.getElementById('cnt').style.display='block';
 
-  } catch(err) {
-    document.getElementById('loader').style.display='none';
-    document.getElementById('content').style.display='block';
-    const msg = err.message.includes('403')
-      ? '⚠ Rate limit alcanzado (60 req/h). Haz clic en el ícono 🔑 del sidebar para agregar tu GitHub Token.'
-      : `⚠ ${err.message}`;
-    toast(msg, 10000);
+  }catch(err){
+    document.getElementById('ldr').style.display='none';
+    document.getElementById('cnt').style.display='block';
+    const msg=err.message.includes('403')
+      ?'⚠ Rate limit de GitHub (60 req/h). Haz clic en 🔑 del sidebar para agregar tu token.'
+      :`⚠ ${err.message}`;
+    showToast(msg,10000);
   }
-
-  document.getElementById('btn-refresh').classList.remove('spinning');
+  document.getElementById('btn-ref').classList.remove('sp');
 }
 
-function setStatus(t) { document.getElementById('l-status').textContent=t; }
-function refreshAll() { loadAll(); }
+async function getCommits(name, lang){
+  try{
+    const d=await api(`https://api.github.com/repos/${ORG}/${name}/commits?per_page=5`);
+    return d.map(c=>({sha:c.sha.slice(0,7),message:c.commit.message.split('\n')[0].slice(0,65),date:c.commit.author.date,lang}));
+  }catch{return []}
+}
+
+function setSt(t){document.getElementById('l-st').textContent=t}
+function showToast(m,d=6000){const t=document.getElementById('toast');t.textContent=m;t.style.display='block';setTimeout(()=>t.style.display='none',d)}
+function refreshAll(){loadAll()}
 
 loadAll();
 </script>
