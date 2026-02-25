@@ -3,546 +3,593 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>OIKOS · GitHub Intelligence</title>
+<title>OIKOS · Dev Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Cabinet+Grotesk:wght@700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
 :root {
-  --bg:       #060709;
-  --s1:       #0d0f14;
-  --s2:       #12151c;
-  --border:   #1c2030;
-  --border2:  #262d40;
-  --g:        #00ffaa;
-  --g2:       #00c97d;
-  --gdim:     rgba(0,255,170,0.08);
-  --gdim2:    rgba(0,255,170,0.15);
-  --blue:     #4d9fff;
-  --bdim:     rgba(77,159,255,0.1);
-  --amber:    #ffb84d;
-  --adim:     rgba(255,184,77,0.1);
-  --red:      #ff5c5c;
-  --rdim:     rgba(255,92,92,0.1);
-  --purple:   #c084fc;
-  --pdim:     rgba(192,132,252,0.1);
-  --text:     #e8edf5;
-  --muted:    #4a5568;
-  --muted2:   #6b7a94;
-  --mono:     'JetBrains Mono', monospace;
-  --head:     'Cabinet Grotesk', sans-serif;
+  --bg:        #070b14;
+  --bg2:       #0b1020;
+  --panel:     #0f1525;
+  --panel2:    #131929;
+  --border:    #1a2340;
+  --border2:   #1f2d4e;
+  --border3:   #263556;
+
+  --blue:      #3b82f6;
+  --blue2:     #2563eb;
+  --blue3:     #1d4ed8;
+  --blueglow:  rgba(59,130,246,0.15);
+  --bluedim:   rgba(59,130,246,0.08);
+
+  --cyan:      #06b6d4;
+  --cyandim:   rgba(6,182,212,0.1);
+
+  --indigo:    #6366f1;
+  --indigodim: rgba(99,102,241,0.1);
+
+  --green:     #10b981;
+  --greendim:  rgba(16,185,129,0.1);
+
+  --amber:     #f59e0b;
+  --amberdim:  rgba(245,158,11,0.1);
+
+  --red:       #ef4444;
+  --reddim:    rgba(239,68,68,0.1);
+
+  --purple:    #8b5cf6;
+  --purpledim: rgba(139,92,246,0.1);
+
+  --text:      #e2e8f0;
+  --text2:     #94a3b8;
+  --text3:     #4a5568;
+  --text4:     #2d3748;
+
+  --head:  'Space Grotesk', sans-serif;
+  --body:  'Inter', sans-serif;
+
+  --r:     10px;
+  --r2:    14px;
+  --r3:    18px;
 }
 
-* { margin:0; padding:0; box-sizing:border-box; }
+*, *::before, *::after { margin:0; padding:0; box-sizing:border-box; }
 html { scroll-behavior: smooth; }
+body { font-family: var(--body); background: var(--bg); color: var(--text); min-height:100vh; overflow-x:hidden; }
 
-body {
-  font-family: var(--mono);
-  background: var(--bg);
-  color: var(--text);
-  min-height: 100vh;
-  overflow-x: hidden;
+/* ── NOISE TEXTURE ── */
+body::after {
+  content:''; position:fixed; inset:0; z-index:0; pointer-events:none; opacity:.4;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
 }
 
-/* ── Animated grid bg ── */
-.grid-bg {
-  position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  background-image:
-    linear-gradient(rgba(0,255,170,0.025) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(0,255,170,0.025) 1px, transparent 1px);
-  background-size: 50px 50px;
-  mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
-}
-
-/* ── Top glow ── */
-.top-glow {
-  position: fixed; top: -300px; left: 50%; transform: translateX(-50%);
-  width: 900px; height: 600px; z-index: 0; pointer-events: none;
-  background: radial-gradient(ellipse, rgba(0,255,170,0.07) 0%, transparent 65%);
-}
+/* ── GLOW ORBS ── */
+.orb { position:fixed; border-radius:50%; pointer-events:none; z-index:0; filter:blur(80px); }
+.orb1 { width:600px; height:600px; top:-200px; left:-100px; background:radial-gradient(circle, rgba(37,99,235,0.12) 0%, transparent 70%); }
+.orb2 { width:500px; height:500px; bottom:-150px; right:-100px; background:radial-gradient(circle, rgba(99,102,241,0.1) 0%, transparent 70%); }
+.orb3 { width:300px; height:300px; top:40%; left:40%; background:radial-gradient(circle, rgba(6,182,212,0.06) 0%, transparent 70%); }
 
 /* ── SIDEBAR ── */
 #sidebar {
-  position: fixed; left: 0; top: 0; bottom: 0;
-  width: 72px;
-  background: var(--s1);
+  position:fixed; left:0; top:0; bottom:0; width:60px;
+  background: var(--bg2);
   border-right: 1px solid var(--border);
-  z-index: 100;
-  display: flex; flex-direction: column; align-items: center;
-  padding: 24px 0; gap: 8px;
+  z-index:100;
+  display:flex; flex-direction:column; align-items:center;
+  padding:20px 0; gap:4px;
 }
-.side-logo {
-  width: 40px; height: 40px; border-radius: 10px;
-  background: linear-gradient(135deg, var(--g), var(--g2));
-  display: flex; align-items: center; justify-content: center;
-  font-family: var(--head); font-weight: 900; font-size: 14px; color: #000;
-  margin-bottom: 24px; flex-shrink: 0;
+.s-logo {
+  width:36px; height:36px; border-radius:9px;
+  background: linear-gradient(135deg, var(--blue2), var(--indigo));
+  display:flex; align-items:center; justify-content:center;
+  font-family:var(--head); font-weight:800; font-size:11px; color:#fff;
+  margin-bottom:20px; flex-shrink:0; letter-spacing:-0.5px;
 }
-.side-btn {
-  width: 44px; height: 44px; border-radius: 10px;
-  background: transparent; border: none; cursor: pointer;
-  display: flex; align-items: center; justify-content: center;
-  color: var(--muted); transition: all 0.2s;
-  position: relative;
+.s-btn {
+  width:40px; height:40px; border-radius:9px;
+  background:transparent; border:none; cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--text3); transition:all .2s;
 }
-.side-btn:hover, .side-btn.active { background: var(--gdim); color: var(--g); }
-.side-btn svg { width: 20px; height: 20px; fill: currentColor; }
-.side-sep { width: 32px; height: 1px; background: var(--border); margin: 8px 0; }
+.s-btn:hover { background:var(--bluedim); color:var(--blue); }
+.s-btn.active { background:var(--bluedim); color:var(--blue); }
+.s-btn svg { width:18px; height:18px; fill:none; stroke:currentColor; stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.s-sep { width:28px; height:1px; background:var(--border); margin:6px 0; }
+.s-bottom { margin-top:auto; display:flex; flex-direction:column; align-items:center; gap:4px; }
 
-/* ── MAIN WRAPPER ── */
-#app {
-  margin-left: 72px;
-  position: relative; z-index: 10;
-  min-height: 100vh;
-}
+/* ── APP SHELL ── */
+#app { margin-left:60px; min-height:100vh; position:relative; z-index:10; }
 
 /* ── TOPBAR ── */
 #topbar {
-  position: sticky; top: 0; z-index: 50;
-  height: 64px;
-  background: rgba(6,7,9,0.85);
-  backdrop-filter: blur(20px);
-  border-bottom: 1px solid var(--border);
-  display: flex; align-items: center;
-  padding: 0 32px; gap: 16px;
+  position:sticky; top:0; z-index:50; height:58px;
+  background:rgba(7,11,20,0.8); backdrop-filter:blur(24px);
+  border-bottom:1px solid var(--border);
+  display:flex; align-items:center; padding:0 28px; gap:12px;
 }
-.topbar-title { font-family: var(--head); font-size: 22px; font-weight: 900; color: #fff; flex:1; }
-.topbar-title span { color: var(--g); }
-.live-pill {
-  display: flex; align-items: center; gap: 6px;
-  background: var(--gdim); border: 1px solid rgba(0,255,170,0.3);
-  padding: 5px 12px; border-radius: 20px;
-  font-size: 10px; font-weight: 600; letter-spacing: 1.5px; color: var(--g);
+.tb-brand { font-family:var(--head); font-size:18px; font-weight:800; color:#fff; flex:1; letter-spacing:-.3px; }
+.tb-brand span { color:var(--blue); }
+.tb-org {
+  display:flex; align-items:center; gap:7px;
+  background:var(--panel); border:1px solid var(--border2);
+  padding:5px 12px; border-radius:8px; font-size:11px; color:var(--text2);
 }
-.live-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--g); animation: pulse 2s infinite; }
-@keyframes pulse { 0%,100%{box-shadow:0 0 0 0 rgba(0,255,170,0.4)} 50%{box-shadow:0 0 0 6px rgba(0,255,170,0)} }
-
+.tb-org svg { width:14px; height:14px; fill:none; stroke:var(--blue); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.live-badge {
+  display:flex; align-items:center; gap:5px;
+  background:rgba(16,185,129,0.1); border:1px solid rgba(16,185,129,0.25);
+  padding:4px 10px; border-radius:20px;
+  font-size:10px; font-weight:600; letter-spacing:1.5px; color:var(--green);
+}
+.live-dot { width:5px; height:5px; border-radius:50%; background:var(--green); animation:glow 2s infinite; }
+@keyframes glow { 0%,100%{box-shadow:0 0 0 0 rgba(16,185,129,.5)} 50%{box-shadow:0 0 0 5px rgba(16,185,129,0)} }
+.tb-time { font-size:11px; color:var(--text3); }
 #btn-refresh {
-  display: flex; align-items: center; gap: 7px;
-  padding: 8px 16px; border-radius: 8px;
-  background: transparent; border: 1px solid var(--border2);
-  color: var(--muted2); font-family: var(--mono); font-size: 11px; font-weight: 600;
-  cursor: pointer; letter-spacing: 0.5px;
-  transition: all 0.2s;
+  display:flex; align-items:center; gap:6px;
+  padding:7px 14px; border-radius:8px;
+  background:var(--bluedim); border:1px solid var(--border2);
+  color:var(--blue); font-family:var(--body); font-size:11px; font-weight:600;
+  cursor:pointer; letter-spacing:.3px; transition:all .2s;
 }
-#btn-refresh:hover { border-color: var(--g); color: var(--g); background: var(--gdim); }
-#btn-refresh svg { width: 13px; height: 13px; fill: currentColor; }
-#btn-refresh.spinning svg { animation: spin 0.7s linear infinite; }
-@keyframes spin { to { transform: rotate(360deg); } }
+#btn-refresh:hover { background:var(--blueglow); border-color:var(--blue); }
+#btn-refresh svg { width:13px; height:13px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+#btn-refresh.spinning svg { animation:spin .7s linear infinite; }
+@keyframes spin { to{transform:rotate(360deg)} }
 
-/* ── PAGE CONTENT ── */
-#content { padding: 28px 32px; }
+/* ── CONTENT ── */
+#content { padding:24px 28px 40px; }
 
-/* ── KPI ROW ── */
-.kpi-row {
-  display: grid;
-  grid-template-columns: repeat(6, 1fr);
-  gap: 12px;
-  margin-bottom: 24px;
+/* ── KPI STRIP ── */
+.kpi-grid {
+  display:grid; grid-template-columns:repeat(6,1fr);
+  gap:10px; margin-bottom:20px;
 }
-.kpi-card {
-  background: var(--s1);
-  border: 1px solid var(--border);
-  border-radius: 14px;
-  padding: 18px 20px;
-  display: flex; flex-direction: column; gap: 8px;
-  position: relative; overflow: hidden;
-  opacity: 0; animation: fadeUp 0.5s forwards;
-  transition: border-color 0.2s, transform 0.2s;
+.kpi {
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--r2); padding:16px 18px;
+  position:relative; overflow:hidden;
+  opacity:0; animation:up .5s forwards;
+  transition:border-color .2s, transform .2s;
 }
-.kpi-card:hover { border-color: var(--border2); transform: translateY(-2px); }
-.kpi-card::before {
-  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
-  background: var(--accent, var(--g));
+.kpi:hover { border-color:var(--border2); transform:translateY(-2px); }
+.kpi::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; background:var(--ac, var(--blue)); }
+.kpi-ico {
+  width:32px; height:32px; border-radius:8px;
+  display:flex; align-items:center; justify-content:center;
+  margin-bottom:10px;
+  background:var(--ac-dim, var(--bluedim));
 }
-.kpi-label { font-size: 9px; letter-spacing: 2px; text-transform: uppercase; color: var(--muted2); }
-.kpi-val { font-family: var(--head); font-size: 32px; font-weight: 900; color: #fff; line-height: 1; }
-.kpi-val.g { color: var(--g); }
-.kpi-val.b { color: var(--blue); }
-.kpi-val.a { color: var(--amber); }
-.kpi-val.r { color: var(--red); }
-.kpi-val.p { color: var(--purple); }
-.kpi-sub { font-size: 10px; color: var(--muted); }
-@keyframes fadeUp { to { opacity:1; transform:translateY(0); } }
+.kpi-ico svg { width:16px; height:16px; fill:none; stroke:var(--ac,var(--blue)); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.kpi-val { font-family:var(--head); font-size:28px; font-weight:800; color:#fff; line-height:1; margin-bottom:4px; }
+.kpi-lbl { font-size:10px; color:var(--text3); text-transform:uppercase; letter-spacing:1.5px; }
+.kpi-sub { font-size:10px; color:var(--text3); margin-top:4px; }
+@keyframes up { to{opacity:1;transform:translateY(0)} }
 
-/* ── CHARTS ROW ── */
-.charts-row {
-  display: grid;
-  grid-template-columns: 1fr 1fr 1fr;
-  gap: 16px;
-  margin-bottom: 24px;
+/* ── SECTION TITLE ── */
+.sec-hd {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:14px;
 }
-.chart-card {
-  background: var(--s1);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 22px;
-  opacity: 0; animation: fadeUp 0.5s forwards;
+.sec-lbl {
+  font-size:10px; font-weight:600; letter-spacing:2.5px; text-transform:uppercase; color:var(--text3);
+  display:flex; align-items:center; gap:8px;
 }
-.chart-card.wide {
-  grid-column: span 2;
+.sec-lbl::before { content:''; width:3px; height:13px; border-radius:2px; background:var(--blue); }
+.sec-badge {
+  font-size:10px; color:var(--blue); background:var(--bluedim);
+  border:1px solid rgba(59,130,246,.2); padding:2px 10px; border-radius:20px;
+}
+
+/* ── CHART GRID ── */
+.chart-grid-top {
+  display:grid; grid-template-columns:2fr 1fr;
+  gap:14px; margin-bottom:14px;
+}
+.chart-grid-mid {
+  display:grid; grid-template-columns:1fr 1fr 1fr;
+  gap:14px; margin-bottom:20px;
+}
+.chart-panel {
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--r2); padding:20px;
+  opacity:0; animation:up .5s forwards;
+}
+.chart-hd {
+  display:flex; align-items:center; justify-content:space-between;
+  margin-bottom:16px;
 }
 .chart-title {
-  font-size: 11px; letter-spacing: 2px; text-transform: uppercase;
-  color: var(--muted2); margin-bottom: 18px;
-  display: flex; align-items: center; gap: 8px;
+  font-size:12px; font-weight:600; color:var(--text2);
+  display:flex; align-items:center; gap:7px;
 }
-.chart-title::before {
-  content: ''; width: 3px; height: 14px; border-radius: 2px;
-  background: var(--accent, var(--g));
-}
-.chart-wrap { position: relative; }
+.chart-title svg { width:14px; height:14px; fill:none; stroke:var(--blue); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; }
+.chart-badge { font-size:9px; color:var(--text3); background:var(--panel2); border:1px solid var(--border); padding:2px 8px; border-radius:4px; }
+.chart-wrap { position:relative; }
 
-/* ── REPOS SECTION ── */
-.section-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 16px;
+/* ── TIMELINE ── */
+.timeline-panel {
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--r2); padding:20px; margin-bottom:20px;
+  opacity:0; animation:up .5s forwards;
 }
-.section-label {
-  font-size: 10px; letter-spacing: 3px; text-transform: uppercase; color: var(--muted2);
-  display: flex; align-items: center; gap: 10px;
+.tl-entries { display:flex; flex-direction:column; gap:0; margin-top:4px; }
+.tl-entry {
+  display:flex; gap:16px; padding:12px 0;
+  border-bottom:1px solid var(--border);
+  transition:background .15s;
 }
-.section-label::after { content:''; width:40px; height:1px; background:var(--border2); }
-.repo-count-badge {
-  padding: 3px 10px; border-radius: 20px;
-  background: var(--gdim); border: 1px solid rgba(0,255,170,0.2);
-  color: var(--g); font-size: 10px; font-weight: 600;
+.tl-entry:last-child { border-bottom:none; }
+.tl-entry:hover { background:rgba(59,130,246,.03); margin:0 -20px; padding:12px 20px; }
+.tl-left { display:flex; flex-direction:column; align-items:center; gap:0; width:60px; flex-shrink:0; }
+.tl-time { font-size:9px; color:var(--text3); white-space:nowrap; }
+.tl-line { flex:1; width:1px; background:var(--border); margin:4px 0; min-height:12px; }
+.tl-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; border:2px solid; }
+.tl-dot.fresh  { background:var(--green);  border-color:var(--green);  box-shadow:0 0 8px var(--green);  }
+.tl-dot.warm   { background:var(--amber);  border-color:var(--amber);  }
+.tl-dot.cold   { background:var(--text4);  border-color:var(--text4);  }
+.tl-body { flex:1; min-width:0; }
+.tl-repo { font-size:13px; font-weight:600; color:#fff; margin-bottom:2px; }
+.tl-msg  { font-size:11px; color:var(--text2); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.tl-meta { display:flex; align-items:center; gap:10px; margin-top:5px; }
+.tl-tag  {
+  font-size:9px; padding:1px 7px; border-radius:4px; font-weight:600;
+  display:flex; align-items:center; gap:4px;
 }
+.tl-tag svg { width:10px; height:10px; fill:none; stroke:currentColor; stroke-width:2; }
+.tl-tag.commit { background:var(--bluedim);  color:var(--blue);  border:1px solid rgba(59,130,246,.2); }
+.tl-tag.lang   { background:var(--panel2);   color:var(--text2); border:1px solid var(--border); }
+.tl-right { display:flex; flex-direction:column; align-items:flex-end; gap:4px; flex-shrink:0; }
+.tl-hash { font-size:10px; color:var(--text3); font-family:monospace; }
+.tl-size { font-size:9px; color:var(--text3); }
 
 /* ── REPO CARDS ── */
 #cards-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
-  gap: 14px;
+  display:grid; grid-template-columns:repeat(auto-fill,minmax(360px,1fr));
+  gap:12px;
 }
-
 .repo-card {
-  background: var(--s1);
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  overflow: hidden;
-  opacity: 0; transform: translateY(12px);
-  animation: fadeUp 0.45s forwards;
-  transition: border-color 0.25s, box-shadow 0.25s, transform 0.25s;
+  background:var(--panel); border:1px solid var(--border);
+  border-radius:var(--r2); overflow:hidden;
+  opacity:0; transform:translateY(10px);
+  animation:up .4s forwards;
+  transition:border-color .25s, box-shadow .25s, transform .25s;
 }
 .repo-card:hover {
-  border-color: var(--border2);
-  box-shadow: 0 0 0 1px var(--border2), 0 12px 40px rgba(0,0,0,0.5);
-  transform: translateY(-4px);
+  border-color:var(--border3);
+  box-shadow:0 0 0 1px var(--border2), 0 16px 48px rgba(0,0,0,.5), inset 0 1px 0 rgba(59,130,246,.05);
+  transform:translateY(-3px);
 }
+.card-top-bar { height:2px; }
+.card-inner { padding:18px 20px; display:flex; flex-direction:column; gap:14px; }
 
-/* Card accent strip */
-.card-accent { height: 3px; width: 100%; }
+.card-hd { display:flex; align-items:flex-start; gap:10px; }
+.card-hd-icon {
+  width:36px; height:36px; border-radius:9px; flex-shrink:0;
+  background:var(--bluedim); border:1px solid var(--border2);
+  display:flex; align-items:center; justify-content:center;
+}
+.card-hd-icon svg { width:18px; height:18px; fill:none; stroke:var(--blue); stroke-width:1.6; stroke-linecap:round; stroke-linejoin:round; }
+.card-name { font-family:var(--head); font-size:14px; font-weight:700; color:#fff; margin-bottom:3px; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.card-desc { font-size:11px; color:var(--text3); line-height:1.5; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; }
 
-.card-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; }
+/* Stats row */
+.card-stats {
+  display:grid; grid-template-columns:repeat(4,1fr);
+  border:1px solid var(--border); border-radius:9px; overflow:hidden;
+}
+.cs { padding:9px 6px; display:flex; flex-direction:column; align-items:center; gap:2px; border-right:1px solid var(--border); }
+.cs:last-child { border-right:none; }
+.cs:hover { background:rgba(255,255,255,.02); }
+.cs-ico { margin-bottom:1px; }
+.cs-ico svg { width:12px; height:12px; fill:none; stroke:var(--text3); stroke-width:1.8; stroke-linecap:round; stroke-linejoin:round; display:block; }
+.cs-v { font-family:var(--head); font-size:15px; font-weight:700; color:#fff; }
+.cs-l { font-size:8px; color:var(--text3); letter-spacing:1px; text-transform:uppercase; }
 
-/* Card header */
-.card-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-.card-title-wrap { flex: 1; min-width: 0; }
-.card-name {
-  font-family: var(--head); font-size: 16px; font-weight: 800; color: #fff;
-  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
-  margin-bottom: 4px;
-}
-.card-desc { font-size: 11px; color: var(--muted2); line-height: 1.5; }
-.lang-chip {
-  display: inline-flex; align-items: center; gap: 5px;
-  padding: 4px 10px; border-radius: 6px;
-  font-size: 10px; font-weight: 600; letter-spacing: 0.5px;
-  border: 1px solid; flex-shrink: 0; white-space: nowrap;
-}
-.lang-dot { width: 7px; height: 7px; border-radius: 50%; }
+/* Health bar */
+.card-health { display:flex; flex-direction:column; gap:5px; }
+.health-row { display:flex; align-items:center; gap:8px; }
+.health-lbl { font-size:10px; color:var(--text3); width:54px; flex-shrink:0; }
+.health-bar { flex:1; height:4px; background:var(--border); border-radius:2px; overflow:hidden; }
+.health-fill { height:100%; border-radius:2px; transition:width 1s ease; }
+.health-val { font-size:10px; color:var(--text2); width:28px; text-align:right; flex-shrink:0; }
 
-/* Stats bar */
-.stats-bar {
-  display: grid; grid-template-columns: repeat(4,1fr);
-  border: 1px solid var(--border);
-  border-radius: 10px; overflow: hidden;
+/* Issues */
+.card-issues { display:flex; gap:8px; }
+.iss {
+  flex:1; padding:8px 10px; border-radius:8px;
+  display:flex; align-items:center; gap:8px; justify-content:space-between;
+  font-size:10px; font-weight:600;
 }
-.stat-cell {
-  padding: 10px 6px; display: flex; flex-direction: column;
-  align-items: center; gap: 2px;
-  border-right: 1px solid var(--border);
-  transition: background 0.2s;
-}
-.stat-cell:last-child { border-right: none; }
-.stat-cell:hover { background: rgba(255,255,255,0.03); }
-.stat-ico { font-size: 12px; }
-.stat-v { font-size: 14px; font-weight: 700; color: #fff; font-family: var(--head); }
-.stat-l { font-size: 8px; letter-spacing: 1px; color: var(--muted); text-transform: uppercase; }
+.iss svg { width:12px; height:12px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+.iss.open   { background:var(--greendim); color:var(--green); border:1px solid rgba(16,185,129,.2); }
+.iss.branch { background:var(--bluedim);  color:var(--blue);  border:1px solid rgba(59,130,246,.2); }
+.iss.lang   { background:var(--indigodim);color:var(--indigo);border:1px solid rgba(99,102,241,.2); }
+.iss-num { font-family:var(--head); font-size:18px; font-weight:800; }
 
-/* Issues strip */
-.issues-strip { display: flex; gap: 8px; }
-.iss-pill {
-  flex: 1; padding: 8px 12px; border-radius: 8px;
-  display: flex; align-items: center; justify-content: space-between; gap: 8px;
-  font-size: 10px; font-weight: 600;
+/* Commits mini */
+.card-commits-lbl { font-size:9px; color:var(--text3); letter-spacing:2px; text-transform:uppercase; margin-bottom:6px; }
+.c-row {
+  display:flex; align-items:center; gap:8px;
+  padding:6px 9px; border-radius:7px;
+  background:var(--panel2); border:1px solid var(--border);
+  margin-bottom:4px;
+  transition:border-color .15s;
 }
-.iss-pill.open  { background: var(--gdim); color: var(--g); border: 1px solid rgba(0,255,170,0.2); }
-.iss-pill.other { background: var(--bdim); color: var(--blue); border: 1px solid rgba(77,159,255,0.2); }
-.iss-num { font-family: var(--head); font-size: 20px; font-weight: 900; }
-
-/* Mini commit log */
-.commit-log { display: flex; flex-direction: column; gap: 5px; }
-.commit-row {
-  display: flex; align-items: center; gap: 8px;
-  padding: 6px 10px; border-radius: 7px;
-  background: rgba(255,255,255,0.02);
-  border-left: 2px solid var(--border2);
-  transition: border-color 0.2s, background 0.2s;
-}
-.commit-row:hover { border-left-color: var(--g); background: var(--gdim); }
-.c-hash { font-size: 10px; color: var(--g); font-weight: 600; flex-shrink: 0; min-width: 52px; }
-.c-msg  { font-size: 10px; color: var(--muted2); flex: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.c-time { font-size: 9px; color: var(--muted); flex-shrink: 0; }
+.c-row:hover { border-color:var(--border2); }
+.c-hash { font-size:10px; color:var(--blue); font-family:monospace; font-weight:600; flex-shrink:0; min-width:50px; }
+.c-msg  { font-size:10px; color:var(--text2); flex:1; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+.c-time { font-size:9px; color:var(--text3); flex-shrink:0; }
 
 /* Card footer */
 .card-foot {
-  display: flex; align-items: center; justify-content: space-between;
-  padding-top: 12px; border-top: 1px solid var(--border);
-  font-size: 10px; color: var(--muted);
+  display:flex; align-items:center; justify-content:space-between;
+  padding-top:12px; border-top:1px solid var(--border);
 }
-.push-ind { display: flex; align-items: center; gap: 6px; }
-.pdot { width: 7px; height: 7px; border-radius: 50%; }
-.pdot.fresh  { background: var(--g);     box-shadow: 0 0 8px var(--g); }
-.pdot.warm   { background: var(--amber); }
-.pdot.cold   { background: var(--muted); }
+.push-ind { display:flex; align-items:center; gap:6px; font-size:10px; color:var(--text3); }
+.pdot { width:6px; height:6px; border-radius:50%; }
+.pdot.fresh { background:var(--green); box-shadow:0 0 7px var(--green); }
+.pdot.warm  { background:var(--amber); }
+.pdot.cold  { background:var(--text4); }
 .gh-link {
-  display: flex; align-items: center; gap: 4px;
-  color: var(--blue); text-decoration: none; font-weight: 600;
-  font-size: 10px; transition: color 0.2s;
+  display:flex; align-items:center; gap:4px;
+  color:var(--blue); text-decoration:none; font-size:10px; font-weight:600;
+  transition:color .15s;
 }
-.gh-link:hover { color: #93c5fd; }
+.gh-link:hover { color:#93c5fd; }
+.gh-link svg { width:10px; height:10px; fill:none; stroke:currentColor; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
 
-/* ── LOADING / ERROR ── */
-#loading-screen {
-  position: fixed; inset: 0; z-index: 200;
-  background: var(--bg);
-  display: flex; flex-direction: column;
-  align-items: center; justify-content: center; gap: 24px;
+/* Lang chip */
+.lchip {
+  display:inline-flex; align-items:center; gap:5px;
+  padding:3px 9px; border-radius:5px; font-size:9px; font-weight:600;
+  border:1px solid; letter-spacing:.3px;
 }
-.loader-logo {
-  font-family: var(--head); font-size: 48px; font-weight: 900; color: #fff;
-  opacity: 0; animation: fadeUp 0.5s 0.2s forwards;
+.ldot { width:6px; height:6px; border-radius:50%; }
+
+/* ── LOADING ── */
+#loader {
+  position:fixed; inset:0; z-index:300;
+  background:var(--bg);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:24px;
 }
-.loader-logo span { color: var(--g); }
-.loader-bar-wrap {
-  width: 240px; height: 2px; background: var(--border);
-  border-radius: 2px; overflow: hidden;
-  opacity: 0; animation: fadeUp 0.5s 0.4s forwards;
-}
-.loader-bar {
-  height: 100%; background: linear-gradient(90deg, var(--g2), var(--g));
-  border-radius: 2px;
-  animation: loadprogress 2s ease forwards;
-}
-@keyframes loadprogress { 0%{width:0} 60%{width:80%} 100%{width:100%} }
-.loader-status {
-  font-size: 11px; color: var(--muted2); letter-spacing: 1px;
-  opacity: 0; animation: fadeUp 0.5s 0.6s forwards;
-}
-#error-toast {
-  display: none;
-  position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%);
-  background: var(--rdim); border: 1px solid var(--red);
-  color: var(--red); padding: 12px 24px; border-radius: 10px;
-  font-size: 12px; z-index: 300;
+.l-logo { font-family:var(--head); font-size:42px; font-weight:800; color:#fff; opacity:0; animation:up .5s .1s forwards; }
+.l-logo span { color:var(--blue); }
+.l-bar-wrap { width:220px; height:2px; background:var(--border); border-radius:2px; overflow:hidden; opacity:0; animation:up .5s .3s forwards; }
+.l-bar { height:100%; background:linear-gradient(90deg, var(--blue3), var(--blue), var(--cyan)); border-radius:2px; animation:prog 2.5s ease forwards; }
+@keyframes prog { 0%{width:0} 60%{width:75%} 100%{width:100%} }
+.l-status { font-size:11px; color:var(--text3); letter-spacing:1px; opacity:0; animation:up .5s .5s forwards; }
+
+/* ── TOAST ── */
+#toast {
+  display:none; position:fixed; bottom:24px; left:50%; transform:translateX(-50%);
+  background:var(--reddim); border:1px solid rgba(239,68,68,.3); color:var(--red);
+  padding:10px 20px; border-radius:10px; font-size:12px; z-index:400; max-width:500px; text-align:center;
 }
 
-/* Token modal */
-#token-modal {
-  display: none;
-  position: fixed; inset: 0; z-index: 400;
-  background: rgba(0,0,0,0.7); backdrop-filter: blur(8px);
-  align-items: center; justify-content: center;
-}
-#token-modal.open { display: flex; }
-.modal-box {
-  background: var(--s2); border: 1px solid var(--border2);
-  border-radius: 20px; padding: 32px; width: 480px; max-width: 90vw;
-}
-.modal-title { font-family: var(--head); font-size: 22px; font-weight: 800; color: #fff; margin-bottom: 8px; }
-.modal-sub { font-size: 12px; color: var(--muted2); margin-bottom: 20px; line-height: 1.6; }
-.modal-input {
-  width: 100%; padding: 12px 16px;
-  background: var(--s1); border: 1px solid var(--border2);
-  border-radius: 10px; color: #fff;
-  font-family: var(--mono); font-size: 13px; outline: none;
-  margin-bottom: 12px;
-  transition: border-color 0.2s;
-}
-.modal-input:focus { border-color: var(--g); }
-.modal-btns { display: flex; gap: 8px; }
-.modal-btn {
-  flex: 1; padding: 11px; border-radius: 10px;
-  font-family: var(--mono); font-size: 12px; font-weight: 700;
-  cursor: pointer; border: none; transition: all 0.2s;
-}
-.modal-btn.primary { background: var(--g); color: #000; }
-.modal-btn.primary:hover { background: var(--g2); }
-.modal-btn.secondary { background: var(--border); color: var(--muted2); }
-.modal-btn.secondary:hover { background: var(--border2); color: var(--text); }
+/* ── TOKEN MODAL ── */
+#tmodal { display:none; position:fixed; inset:0; z-index:500; background:rgba(0,0,0,.7); backdrop-filter:blur(8px); align-items:center; justify-content:center; }
+#tmodal.open { display:flex; }
+.mbox { background:var(--panel); border:1px solid var(--border2); border-radius:20px; padding:28px; width:460px; max-width:90vw; }
+.m-title { font-family:var(--head); font-size:20px; font-weight:800; color:#fff; margin-bottom:6px; }
+.m-sub   { font-size:12px; color:var(--text3); line-height:1.6; margin-bottom:18px; }
+.m-input { width:100%; padding:11px 14px; background:var(--bg2); border:1px solid var(--border2); border-radius:9px; color:#fff; font-family:var(--body); font-size:12px; outline:none; margin-bottom:12px; transition:border-color .2s; }
+.m-input:focus { border-color:var(--blue); }
+.m-btns { display:flex; gap:8px; }
+.m-btn { flex:1; padding:10px; border-radius:9px; font-family:var(--body); font-size:12px; font-weight:600; cursor:pointer; border:none; transition:all .2s; }
+.m-btn.p { background:var(--blue2); color:#fff; }
+.m-btn.p:hover { background:var(--blue3); }
+.m-btn.s { background:var(--border); color:var(--text3); }
+.m-btn.s:hover { background:var(--border2); color:var(--text); }
 
-@media(max-width: 1100px) { .kpi-row { grid-template-columns: repeat(3,1fr); } }
-@media(max-width: 900px)  { .charts-row { grid-template-columns: 1fr; } .chart-card.wide { grid-column: span 1; } }
-@media(max-width: 700px)  { #sidebar { display: none; } #app { margin-left: 0; } #content { padding: 16px; } .kpi-row { grid-template-columns: repeat(2,1fr); } }
+@media(max-width:1100px) { .kpi-grid{grid-template-columns:repeat(3,1fr)} }
+@media(max-width:900px)  { .chart-grid-top,.chart-grid-mid{grid-template-columns:1fr} }
+@media(max-width:700px)  { #sidebar{display:none} #app{margin-left:0} #content{padding:16px} .kpi-grid{grid-template-columns:repeat(2,1fr)} }
 </style>
 </head>
 <body>
 
-<!-- BG -->
-<div class="grid-bg"></div>
-<div class="top-glow"></div>
+<div class="orb orb1"></div>
+<div class="orb orb2"></div>
+<div class="orb orb3"></div>
 
-<!-- LOADING -->
-<div id="loading-screen">
-  <div class="loader-logo">OIKOS <span>Dev</span></div>
-  <div class="loader-bar-wrap"><div class="loader-bar"></div></div>
-  <div class="loader-status" id="load-status">Conectando con GitHub API...</div>
+<!-- LOADER -->
+<div id="loader">
+  <div class="l-logo">OIKOS <span>Dev</span></div>
+  <div class="l-bar-wrap"><div class="l-bar"></div></div>
+  <div class="l-status" id="l-status">Inicializando...</div>
 </div>
 
-<!-- ERROR TOAST -->
-<div id="error-toast"></div>
+<!-- TOAST -->
+<div id="toast"></div>
 
 <!-- TOKEN MODAL -->
-<div id="token-modal">
-  <div class="modal-box">
-    <div class="modal-title">🔑 GitHub Token</div>
-    <div class="modal-sub">Agrega tu Personal Access Token para ver repos privados y eliminar el rate limit de 60 req/hora. El token se guarda solo en tu browser.</div>
-    <input class="modal-input" type="password" id="gh-token-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
-    <div class="modal-btns">
-      <button class="modal-btn primary" onclick="applyToken()">APLICAR TOKEN</button>
-      <button class="modal-btn secondary" onclick="closeTokenModal()">CANCELAR</button>
+<div id="tmodal">
+  <div class="mbox">
+    <div class="m-title">GitHub Token</div>
+    <div class="m-sub">Para repos privados y mayor rate limit (5000 req/h vs 60 req/h). Se guarda en tu browser, no sale a ningún servidor.</div>
+    <input class="m-input" type="password" id="tk-input" placeholder="ghp_xxxxxxxxxxxxxxxxxxxx">
+    <div class="m-btns">
+      <button class="m-btn p" onclick="applyTk()">Aplicar token</button>
+      <button class="m-btn s" onclick="closeTk()">Cancelar</button>
     </div>
   </div>
 </div>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
-  <div class="side-logo">OK</div>
-  <button class="side-btn active" title="Dashboard">
-    <svg viewBox="0 0 24 24"><path d="M3 13h8V3H3v10zm0 8h8v-6H3v6zm10 0h8V11h-8v10zm0-18v6h8V3h-8z"/></svg>
+  <div class="s-logo">OK</div>
+  <button class="s-btn active" title="Dashboard">
+    <!-- grid icon -->
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
   </button>
-  <div class="side-sep"></div>
-  <button class="side-btn" title="GitHub Token" onclick="openTokenModal()">
-    <svg viewBox="0 0 24 24"><path d="M12 1C5.925 1 1 5.925 1 12c0 4.86 3.152 8.983 7.523 10.437.55.101.75-.238.75-.53 0-.262-.01-1.133-.015-2.066C6.726 20.4 6.112 18.434 6.112 18.434c-.5-1.271-1.221-1.61-1.221-1.61-.999-.682.076-.668.076-.668 1.105.078 1.685 1.134 1.685 1.134.981 1.682 2.575 1.195 3.202.914.1-.71.384-1.195.698-1.47-2.441-.278-5.007-1.222-5.007-5.438 0-1.2.428-2.182 1.132-2.952-.114-.278-.491-1.396.108-2.91 0 0 .923-.295 3.025 1.128A10.536 10.536 0 0 1 12 6.31c.935.004 1.877.127 2.754.372 2.1-1.423 3.023-1.128 3.023-1.128.6 1.514.223 2.632.11 2.91.704.77 1.13 1.752 1.13 2.952 0 4.227-2.57 5.157-5.018 5.43.394.34.746 1.01.746 2.034 0 1.47-.014 2.657-.014 3.018 0 .294.198.636.756.528C19.851 20.979 23 16.859 23 12c0-6.075-4.925-11-11-11z"/></svg>
+  <div class="s-sep"></div>
+  <button class="s-btn" title="Token" onclick="openTk()">
+    <!-- key icon -->
+    <svg viewBox="0 0 24 24"><circle cx="8" cy="15" r="5"/><path d="M21 3l-9.4 9.4M15.5 4.5l3 3"/></svg>
   </button>
-  <button class="side-btn" title="Refrescar" onclick="refreshAll()">
-    <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+  <button class="s-btn" title="Refrescar" onclick="refreshAll()">
+    <!-- refresh icon -->
+    <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
   </button>
+  <div class="s-sep"></div>
+  <div class="s-bottom">
+    <button class="s-btn" title="GitHub" onclick="window.open('https://github.com/'+ORG,'_blank')">
+      <!-- github icon -->
+      <svg viewBox="0 0 24 24"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"/></svg>
+    </button>
+  </div>
 </div>
 
 <!-- APP -->
 <div id="app">
-  <!-- TOPBAR -->
   <div id="topbar">
-    <div class="topbar-title">OIKOS <span>Dev Intelligence</span></div>
-    <div class="live-pill"><div class="live-dot"></div>LIVE</div>
-    <div id="last-update" style="font-size:10px;color:var(--muted);"></div>
+    <div class="tb-brand">OIKOS <span>Dev Intelligence</span></div>
+    <div class="tb-org">
+      <svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+      <span id="org-label">analistadatos-Oikos</span>
+    </div>
+    <div class="live-badge"><div class="live-dot"></div>LIVE</div>
+    <div class="tb-time" id="tb-time">—</div>
     <button id="btn-refresh" onclick="refreshAll()">
-      <svg viewBox="0 0 24 24"><path d="M17.65 6.35A7.958 7.958 0 0 0 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08A5.99 5.99 0 0 1 12 18c-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-      REFRESH
+      <svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+      Refrescar
     </button>
   </div>
 
-  <!-- CONTENT -->
-  <div id="content" style="display:none;">
+  <div id="content" style="display:none">
 
     <!-- KPIs -->
-    <div class="kpi-row" id="kpi-row">
-      <div class="kpi-card" style="--accent:var(--g);animation-delay:0.05s">
-        <div class="kpi-label">Repositorios</div>
-        <div class="kpi-val g" id="k-repos">0</div>
+    <div class="kpi-grid" id="kpi-grid">
+      <div class="kpi" style="--ac:var(--blue);--ac-dim:var(--bluedim);animation-delay:.05s">
+        <div class="kpi-ico"><svg viewBox="0 0 24 24"><path d="M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z"/></svg></div>
+        <div class="kpi-val" id="k-repos">0</div>
+        <div class="kpi-lbl">Repositorios</div>
         <div class="kpi-sub">públicos activos</div>
       </div>
-      <div class="kpi-card" style="--accent:var(--blue);animation-delay:0.1s">
-        <div class="kpi-label">Total Stars</div>
-        <div class="kpi-val b" id="k-stars">0</div>
+      <div class="kpi" style="--ac:var(--amber);--ac-dim:var(--amberdim);animation-delay:.1s">
+        <div class="kpi-ico"><svg viewBox="0 0 24 24" style="stroke:var(--amber)"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+        <div class="kpi-val" id="k-stars">0</div>
+        <div class="kpi-lbl">Total Stars</div>
         <div class="kpi-sub">acumuladas</div>
       </div>
-      <div class="kpi-card" style="--accent:var(--amber);animation-delay:0.15s">
-        <div class="kpi-label">Forks</div>
-        <div class="kpi-val a" id="k-forks">0</div>
-        <div class="kpi-sub">total</div>
+      <div class="kpi" style="--ac:var(--cyan);--ac-dim:var(--cyandim);animation-delay:.15s">
+        <div class="kpi-ico"><svg viewBox="0 0 24 24" style="stroke:var(--cyan)"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M6 9v12"/></svg></div>
+        <div class="kpi-val" id="k-forks">0</div>
+        <div class="kpi-lbl">Forks</div>
+        <div class="kpi-sub">totales</div>
       </div>
-      <div class="kpi-card" style="--accent:var(--red);animation-delay:0.2s">
-        <div class="kpi-label">Issues Abiertos</div>
-        <div class="kpi-val r" id="k-issues">0</div>
+      <div class="kpi" style="--ac:var(--red);--ac-dim:var(--reddim);animation-delay:.2s">
+        <div class="kpi-ico"><svg viewBox="0 0 24 24" style="stroke:var(--red)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></div>
+        <div class="kpi-val" id="k-issues">0</div>
+        <div class="kpi-lbl">Issues Abiertos</div>
         <div class="kpi-sub">pendientes</div>
       </div>
-      <div class="kpi-card" style="--accent:var(--purple);animation-delay:0.25s">
-        <div class="kpi-label">Lenguajes</div>
-        <div class="kpi-val p" id="k-langs">0</div>
+      <div class="kpi" style="--ac:var(--purple);--ac-dim:var(--purpledim);animation-delay:.25s">
+        <div class="kpi-ico"><svg viewBox="0 0 24 24" style="stroke:var(--purple)"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></div>
+        <div class="kpi-val" id="k-langs">0</div>
+        <div class="kpi-lbl">Lenguajes</div>
         <div class="kpi-sub">distintos</div>
       </div>
-      <div class="kpi-card" style="--accent:var(--g);animation-delay:0.3s">
-        <div class="kpi-label">Último Push</div>
-        <div class="kpi-val g" id="k-lastpush" style="font-size:18px;padding-top:6px;">—</div>
+      <div class="kpi" style="--ac:var(--green);--ac-dim:var(--greendim);animation-delay:.3s">
+        <div class="kpi-ico"><svg viewBox="0 0 24 24" style="stroke:var(--green)"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg></div>
+        <div class="kpi-val" id="k-commits" style="font-size:22px;padding-top:4px">0</div>
+        <div class="kpi-lbl">Commits Recientes</div>
         <div class="kpi-sub" id="k-lastpush-repo">—</div>
       </div>
     </div>
 
-    <!-- CHARTS -->
-    <div class="charts-row">
-      <!-- Commits por repo (barra) -->
-      <div class="chart-card wide" style="--accent:var(--g);animation-delay:0.35s">
-        <div class="chart-title">Actividad de Commits por Repositorio</div>
-        <div class="chart-wrap" style="height:220px;">
-          <canvas id="chart-commits"></canvas>
+    <!-- CHARTS ROW 1 -->
+    <div class="sec-hd"><div class="sec-lbl">Análisis Visual</div></div>
+    <div class="chart-grid-top" style="margin-bottom:14px">
+      <!-- Commits por repo -->
+      <div class="chart-panel" style="animation-delay:.35s">
+        <div class="chart-hd">
+          <div class="chart-title">
+            <svg viewBox="0 0 24 24"><rect x="18" y="3" width="4" height="18"/><rect x="10" y="8" width="4" height="13"/><rect x="2" y="13" width="4" height="8"/></svg>
+            Commits por Repositorio
+          </div>
+          <div class="chart-badge">últimos 3 por repo</div>
         </div>
+        <div class="chart-wrap" style="height:230px"><canvas id="ch-commits"></canvas></div>
       </div>
-
-      <!-- Lenguajes (dona) -->
-      <div class="chart-card" style="--accent:var(--purple);animation-delay:0.4s">
-        <div class="chart-title" style="--accent:var(--purple)">Lenguajes</div>
-        <div class="chart-wrap" style="height:220px;display:flex;align-items:center;justify-content:center;">
-          <canvas id="chart-langs" style="max-width:200px;max-height:200px;"></canvas>
+      <!-- Lang donut -->
+      <div class="chart-panel" style="animation-delay:.4s">
+        <div class="chart-hd">
+          <div class="chart-title">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/><line x1="2" y1="12" x2="22" y2="12"/></svg>
+            Lenguajes
+          </div>
+          <div class="chart-badge" id="lang-count-badge">0 tecnologías</div>
         </div>
+        <div class="chart-wrap" style="height:230px"><canvas id="ch-langs"></canvas></div>
       </div>
     </div>
 
-    <!-- STARS ranking -->
-    <div class="charts-row" style="grid-template-columns:1fr 1fr;margin-bottom:24px;">
-      <div class="chart-card" style="--accent:var(--blue);animation-delay:0.45s">
-        <div class="chart-title" style="--accent:var(--blue)">Stars por Repositorio</div>
-        <div class="chart-wrap" style="height:200px;">
-          <canvas id="chart-stars"></canvas>
+    <!-- CHARTS ROW 2 -->
+    <div class="chart-grid-mid">
+      <!-- Stars -->
+      <div class="chart-panel" style="animation-delay:.45s">
+        <div class="chart-hd">
+          <div class="chart-title">
+            <svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+            Stars Ranking
+          </div>
         </div>
+        <div class="chart-wrap" style="height:190px"><canvas id="ch-stars"></canvas></div>
       </div>
-      <div class="chart-card" style="--accent:var(--amber);animation-delay:0.5s">
-        <div class="chart-title" style="--accent:var(--amber)">Issues Abiertos por Repo</div>
-        <div class="chart-wrap" style="height:200px;">
-          <canvas id="chart-issues"></canvas>
+      <!-- Forks -->
+      <div class="chart-panel" style="animation-delay:.5s">
+        <div class="chart-hd">
+          <div class="chart-title">
+            <svg viewBox="0 0 24 24"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M6 9v12"/></svg>
+            Forks por Repo
+          </div>
         </div>
+        <div class="chart-wrap" style="height:190px"><canvas id="ch-forks"></canvas></div>
+      </div>
+      <!-- Size -->
+      <div class="chart-panel" style="animation-delay:.55s">
+        <div class="chart-hd">
+          <div class="chart-title">
+            <svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+            Tamaño repos (KB)
+          </div>
+        </div>
+        <div class="chart-wrap" style="height:190px"><canvas id="ch-size"></canvas></div>
+      </div>
+    </div>
+
+    <!-- TIMELINE -->
+    <div class="sec-hd"><div class="sec-lbl">Línea de Tiempo — Actividad Reciente</div><div class="sec-badge" id="tl-badge">0 eventos</div></div>
+    <div class="timeline-panel" style="animation-delay:.6s">
+      <div class="tl-entries" id="tl-entries">
+        <div style="color:var(--text3);font-size:12px;padding:20px 0;text-align:center">Cargando actividad...</div>
       </div>
     </div>
 
     <!-- REPO CARDS -->
-    <div class="section-header">
-      <div class="section-label">Repositorios</div>
-      <div class="repo-count-badge" id="repo-badge">0 repos</div>
+    <div class="sec-hd">
+      <div class="sec-lbl">Repositorios</div>
+      <div class="sec-badge" id="repo-badge">0 repos</div>
     </div>
     <div id="cards-grid"></div>
-  </div>
-</div>
+
+  </div><!-- /content -->
+</div><!-- /app -->
 
 <script>
 const ORG = 'analistadatos-Oikos';
 let ghToken = localStorage.getItem('gh_token') || '';
-let charts = {};
+let CHARTS = {};
 
-// ── TOKEN MODAL ──
-function openTokenModal() {
-  document.getElementById('gh-token-input').value = ghToken;
-  document.getElementById('token-modal').classList.add('open');
-}
-function closeTokenModal() { document.getElementById('token-modal').classList.remove('open'); }
-function applyToken() {
-  ghToken = document.getElementById('gh-token-input').value.trim();
-  if (ghToken) localStorage.setItem('gh_token', ghToken);
-  else localStorage.removeItem('gh_token');
-  closeTokenModal();
-  refreshAll();
+// ── TOKEN ──
+function openTk()  { document.getElementById('tk-input').value = ghToken; document.getElementById('tmodal').classList.add('open'); }
+function closeTk() { document.getElementById('tmodal').classList.remove('open'); }
+function applyTk() {
+  ghToken = document.getElementById('tk-input').value.trim();
+  ghToken ? localStorage.setItem('gh_token', ghToken) : localStorage.removeItem('gh_token');
+  closeTk(); refreshAll();
 }
 
 // ── API ──
@@ -557,305 +604,391 @@ async function get(url) {
   return r.json();
 }
 
-// ── HELPERS ──
-function esc(s) {
-  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
-}
-function timeAgo(d) {
+// ── UTILS ──
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function ago(d) {
   if (!d) return '—';
   const s = (Date.now() - new Date(d)) / 1000;
-  if (s < 60)    return 'ahora';
-  if (s < 3600)  return `${Math.floor(s/60)}m`;
-  if (s < 86400) return `${Math.floor(s/3600)}h`;
-  if (s < 604800)return `${Math.floor(s/86400)}d`;
-  return `${Math.floor(s/2592000)}mes`;
+  if (s < 60)    return 'ahora mismo';
+  if (s < 3600)  return `hace ${Math.floor(s/60)}m`;
+  if (s < 86400) return `hace ${Math.floor(s/3600)}h`;
+  if (s < 604800)return `hace ${Math.floor(s/86400)}d`;
+  if (s < 2592000) return `hace ${Math.floor(s/604800)} sem`;
+  return `hace ${Math.floor(s/2592000)} mes`;
 }
 function pushCls(d) {
-  const days = (Date.now() - new Date(d)) / 86400000;
+  const days = d ? (Date.now()-new Date(d))/86400000 : 999;
   return days < 7 ? 'fresh' : days < 30 ? 'warm' : 'cold';
 }
+function fmtSize(kb) { return kb > 1024 ? (kb/1024).toFixed(1)+'MB' : kb+'KB'; }
 
 // ── LANG PALETTE ──
-const LC = {
-  JavaScript: { bg:'#2d1f05', bd:'#f59e0b', dot:'#f59e0b', tx:'#fbbf24', chart:'rgba(245,158,11,0.8)' },
-  Python:     { bg:'#071830', bd:'#3b82f6', dot:'#3b82f6', tx:'#60a5fa', chart:'rgba(59,130,246,0.8)' },
-  HTML:       { bg:'#1f0b02', bd:'#ea580c', dot:'#ea580c', tx:'#fb923c', chart:'rgba(234,88,12,0.8)'  },
-  CSS:        { bg:'#0a0e2a', bd:'#6366f1', dot:'#6366f1', tx:'#818cf8', chart:'rgba(99,102,241,0.8)' },
-  TypeScript: { bg:'#040e2a', bd:'#2563eb', dot:'#2563eb', tx:'#93c5fd', chart:'rgba(37,99,235,0.8)'  },
-  Shell:      { bg:'#001509', bd:'#00ffaa', dot:'#00ffaa', tx:'#00ffaa', chart:'rgba(0,255,170,0.8)'  },
-  Dockerfile: { bg:'#021525', bd:'#0ea5e9', dot:'#0ea5e9', tx:'#38bdf8', chart:'rgba(14,165,233,0.8)' },
-  default:    { bg:'#111', bd:'#4a5568', dot:'#94a3b8', tx:'#94a3b8', chart:'rgba(148,163,184,0.8)'   },
+const LP = {
+  JavaScript: { bg:'#2a1f08',bd:'#f59e0b',dot:'#f59e0b',tx:'#fbbf24',ch:'rgba(245,158,11,.75)' },
+  Python:     { bg:'#071b38',bd:'#3b82f6',dot:'#3b82f6',tx:'#60a5fa',ch:'rgba(59,130,246,.75)' },
+  HTML:       { bg:'#1f0c04',bd:'#f97316',dot:'#f97316',tx:'#fb923c',ch:'rgba(249,115,22,.75)'  },
+  CSS:        { bg:'#0c0f2a',bd:'#6366f1',dot:'#6366f1',tx:'#818cf8',ch:'rgba(99,102,241,.75)'  },
+  TypeScript: { bg:'#040f2a',bd:'#2563eb',dot:'#2563eb',tx:'#93c5fd',ch:'rgba(37,99,235,.75)'   },
+  Shell:      { bg:'#031510',bd:'#10b981',dot:'#10b981',tx:'#34d399',ch:'rgba(16,185,129,.75)'  },
+  Dockerfile: { bg:'#021525',bd:'#06b6d4',dot:'#06b6d4',tx:'#22d3ee',ch:'rgba(6,182,212,.75)'  },
+  Vue:        { bg:'#062018',bd:'#42b883',dot:'#42b883',tx:'#6ee7b7',ch:'rgba(66,184,131,.75)'  },
+  default:    { bg:'#111827',bd:'#4a5568',dot:'#94a3b8',tx:'#94a3b8',ch:'rgba(148,163,184,.75)' },
 };
-function lc(lang) { return LC[lang] || LC.default; }
+function lp(lang) { return LP[lang] || LP.default; }
 
 // ── CHART DEFAULTS ──
-const CHART_DEFAULTS = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: { legend: { display: false } },
-  scales: {
-    x: { ticks: { color: '#4a5568', font: { family: "'JetBrains Mono'", size: 9 } }, grid: { color: '#1c2030' } },
-    y: { ticks: { color: '#4a5568', font: { family: "'JetBrains Mono'", size: 9 } }, grid: { color: '#1c2030' } }
+const CD = {
+  responsive:true, maintainAspectRatio:false,
+  plugins:{ legend:{ display:false } },
+  scales:{
+    x:{ ticks:{ color:'#4a5568', font:{ family:'Inter', size:9 }, maxRotation:35 }, grid:{ color:'#1a2340' }, border:{ color:'#1a2340' } },
+    y:{ ticks:{ color:'#4a5568', font:{ family:'Inter', size:9 } }, grid:{ color:'#1a2340' }, border:{ color:'#1a2340' } }
   }
 };
 
-function destroyCharts() {
-  Object.values(charts).forEach(c => c.destroy());
-  charts = {};
-}
+function nukecharts() { Object.values(CHARTS).forEach(c=>c.destroy()); CHARTS={}; }
 
-function buildCharts(repos, allCommits) {
-  destroyCharts();
+function drawCharts(repos, allCommits) {
+  nukecharts();
+  const top = [...repos].sort((a,b)=>new Date(b.pushed_at)-new Date(a.pushed_at)).slice(0,12);
+  const short = r => r.name.slice(0,14);
 
-  // Sort by pushed for charts
-  const top = [...repos].sort((a,b) => b.pushed_at > a.pushed_at ? 1 : -1).slice(0, 12);
-
-  // ── Commits bar chart ──
-  const commitCounts = top.map(r => (allCommits[r.name] || []).length);
-  charts.commits = new Chart(document.getElementById('chart-commits'), {
-    type: 'bar',
-    data: {
-      labels: top.map(r => r.name.replace('analistadatos-Oikos/', '').slice(0,18)),
-      datasets: [{
-        data: commitCounts,
-        backgroundColor: top.map(r => lc(r.language).chart),
-        borderColor: top.map(r => lc(r.language).bd),
-        borderWidth: 1,
-        borderRadius: 6,
-      }]
+  // Commits
+  CHARTS.commits = new Chart(document.getElementById('ch-commits'), {
+    type:'bar',
+    data:{
+      labels: top.map(short),
+      datasets:[{ data: top.map(r=>(allCommits[r.name]||[]).length),
+        backgroundColor: top.map(r=>lp(r.language).ch),
+        borderColor: top.map(r=>lp(r.language).bd),
+        borderWidth:1, borderRadius:6, borderSkipped:false }]
     },
-    options: { ...CHART_DEFAULTS, plugins: { legend: { display: false } } }
+    options:{ ...CD }
   });
 
-  // ── Lang donut ──
-  const langCount = {};
-  repos.forEach(r => { if (r.language) langCount[r.language] = (langCount[r.language]||0) + 1; });
-  const langKeys = Object.keys(langCount).sort((a,b) => langCount[b]-langCount[a]);
-  charts.langs = new Chart(document.getElementById('chart-langs'), {
-    type: 'doughnut',
-    data: {
-      labels: langKeys,
-      datasets: [{
-        data: langKeys.map(l => langCount[l]),
-        backgroundColor: langKeys.map(l => lc(l).chart),
-        borderColor: langKeys.map(l => lc(l).bd),
-        borderWidth: 2,
-      }]
+  // Lang donut
+  const lc={};
+  repos.forEach(r=>{ if(r.language) lc[r.language]=(lc[r.language]||0)+1; });
+  const lkeys = Object.keys(lc).sort((a,b)=>lc[b]-lc[a]);
+  document.getElementById('lang-count-badge').textContent = lkeys.length+' tecnologías';
+  CHARTS.langs = new Chart(document.getElementById('ch-langs'), {
+    type:'doughnut',
+    data:{
+      labels:lkeys,
+      datasets:[{ data:lkeys.map(l=>lc[l]),
+        backgroundColor:lkeys.map(l=>lp(l).ch),
+        borderColor:lkeys.map(l=>lp(l).bd),
+        borderWidth:2, hoverOffset:6 }]
     },
-    options: {
-      responsive: true, maintainAspectRatio: false,
-      plugins: {
-        legend: {
-          display: true, position: 'bottom',
-          labels: { color: '#6b7a94', font: { family: "'JetBrains Mono'", size: 9 }, boxWidth: 10, padding: 8 }
+    options:{
+      responsive:true, maintainAspectRatio:false, cutout:'60%',
+      plugins:{
+        legend:{
+          display:true, position:'bottom',
+          labels:{ color:'#4a5568', font:{family:'Inter',size:9}, boxWidth:8, padding:10, usePointStyle:true }
         }
-      },
-      cutout: '65%'
+      }
     }
   });
 
-  // ── Stars bar ──
-  const topStars = [...repos].sort((a,b) => b.stargazers_count - a.stargazers_count).slice(0,10);
-  charts.stars = new Chart(document.getElementById('chart-stars'), {
-    type: 'bar',
-    data: {
-      labels: topStars.map(r => r.name.slice(0,16)),
-      datasets: [{
-        data: topStars.map(r => r.stargazers_count),
-        backgroundColor: 'rgba(77,159,255,0.7)',
-        borderColor: '#4d9fff',
-        borderWidth: 1, borderRadius: 5,
-      }]
-    },
-    options: { ...CHART_DEFAULTS }
+  // Stars
+  const byStars = [...repos].sort((a,b)=>b.stargazers_count-a.stargazers_count).slice(0,10);
+  CHARTS.stars = new Chart(document.getElementById('ch-stars'),{
+    type:'bar',
+    data:{
+      labels:byStars.map(short),
+      datasets:[{ data:byStars.map(r=>r.stargazers_count),
+        backgroundColor:'rgba(245,158,11,.7)', borderColor:'#f59e0b',
+        borderWidth:1, borderRadius:5 }]
+    }, options:{...CD}
   });
 
-  // ── Issues bar ──
-  const topIssues = [...repos].filter(r => r.open_issues_count > 0)
-    .sort((a,b) => b.open_issues_count - a.open_issues_count).slice(0,10);
-  charts.issues = new Chart(document.getElementById('chart-issues'), {
-    type: 'bar',
-    data: {
-      labels: topIssues.map(r => r.name.slice(0,16)),
-      datasets: [{
-        data: topIssues.map(r => r.open_issues_count),
-        backgroundColor: 'rgba(255,92,92,0.7)',
-        borderColor: '#ff5c5c',
-        borderWidth: 1, borderRadius: 5,
+  // Forks — horizontal
+  const byForks = [...repos].sort((a,b)=>b.forks_count-a.forks_count).slice(0,10);
+  CHARTS.forks = new Chart(document.getElementById('ch-forks'),{
+    type:'bar',
+    data:{
+      labels:byForks.map(short),
+      datasets:[{ data:byForks.map(r=>r.forks_count),
+        backgroundColor:'rgba(6,182,212,.7)', borderColor:'#06b6d4',
+        borderWidth:1, borderRadius:5 }]
+    }, options:{...CD, indexAxis:'y',
+      scales:{
+        x:{ ticks:{color:'#4a5568',font:{family:'Inter',size:9}}, grid:{color:'#1a2340'}, border:{color:'#1a2340'} },
+        y:{ ticks:{color:'#4a5568',font:{family:'Inter',size:9}}, grid:{color:'#1a2340'}, border:{color:'#1a2340'} }
+      }
+    }
+  });
+
+  // Size line
+  const bySize = [...repos].sort((a,b)=>b.size-a.size).slice(0,10);
+  CHARTS.size = new Chart(document.getElementById('ch-size'),{
+    type:'line',
+    data:{
+      labels:bySize.map(short),
+      datasets:[{
+        data:bySize.map(r=>r.size),
+        borderColor:'#8b5cf6', backgroundColor:'rgba(139,92,246,.1)',
+        borderWidth:2, pointBackgroundColor:'#8b5cf6',
+        pointRadius:4, fill:true, tension:.35
       }]
-    },
-    options: { ...CHART_DEFAULTS }
+    }, options:{...CD}
   });
 }
 
-// ── BUILD REPO CARD ──
-function buildCard(repo, commits, idx) {
-  const s = lc(repo.language);
+// ── TIMELINE ──
+async function buildTimeline(repos, allCommits) {
+  const events = [];
+  repos.forEach(repo => {
+    const commits = allCommits[repo.name] || [];
+    commits.forEach(c => {
+      events.push({
+        type:'commit', repo:repo.name, msg:c.message,
+        date:c.date, hash:c.sha, lang:repo.language,
+        url:repo.html_url
+      });
+    });
+  });
+  events.sort((a,b) => new Date(b.date)-new Date(a.date));
+  const top = events.slice(0,20);
+  document.getElementById('tl-badge').textContent = `${top.length} eventos`;
+
+  const html = top.map((e,i) => {
+    const pc = pushCls(e.date);
+    const s = lp(e.lang);
+    return `
+      <div class="tl-entry">
+        <div class="tl-left">
+          <div class="tl-time">${ago(e.date)}</div>
+          <div class="tl-line"></div>
+        </div>
+        <div style="display:flex;align-items:center;padding:2px 0;flex-shrink:0">
+          <div class="tl-dot ${pc}"></div>
+        </div>
+        <div class="tl-body" style="padding-left:12px">
+          <div class="tl-repo">${esc(e.repo)}</div>
+          <div class="tl-msg">${esc(e.msg)}</div>
+          <div class="tl-meta">
+            <span class="tl-tag commit">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><line x1="1.05" y1="12" x2="7" y2="12"/><line x1="17.01" y1="12" x2="22.96" y2="12"/></svg>
+              commit
+            </span>
+            ${e.lang ? `<span class="tl-tag lang" style="background:${s.bg};border-color:${s.bd};color:${s.tx}">${e.lang}</span>` : ''}
+          </div>
+        </div>
+        <div class="tl-right">
+          <div class="tl-hash">${e.hash}</div>
+        </div>
+      </div>`;
+  }).join('');
+  document.getElementById('tl-entries').innerHTML = html || '<div style="color:var(--text3);font-size:12px;padding:20px 0;text-align:center">Sin actividad reciente</div>';
+}
+
+// ── HEALTH BAR ──
+function healthBar(label, val, max, color) {
+  const pct = max > 0 ? Math.round((val/max)*100) : 0;
+  return `<div class="health-row">
+    <div class="health-lbl">${label}</div>
+    <div class="health-bar"><div class="health-fill" style="width:${pct}%;background:${color}"></div></div>
+    <div class="health-val">${val}</div>
+  </div>`;
+}
+
+// ── CARD ──
+function buildCard(repo, commits, maxStars, maxForks, idx) {
+  const s = lp(repo.language);
   const pc = pushCls(repo.pushed_at);
-  const accentColor = pc === 'fresh' ? 'var(--g)' : pc === 'warm' ? 'var(--amber)' : 'var(--border2)';
+  const accentGrad = pc==='fresh'
+    ? 'linear-gradient(90deg,var(--green),var(--cyan),transparent)'
+    : pc==='warm'
+    ? 'linear-gradient(90deg,var(--amber),transparent)'
+    : 'linear-gradient(90deg,var(--border2),transparent)';
 
-  const langChip = repo.language
-    ? `<span class="lang-chip" style="background:${s.bg};border-color:${s.bd};color:${s.tx}">
-         <span class="lang-dot" style="background:${s.dot}"></span>${repo.language}
-       </span>`
-    : `<span class="lang-chip" style="background:#111;border-color:#333;color:#555">N/A</span>`;
+  const chipHtml = repo.language
+    ? `<span class="lchip" style="background:${s.bg};border-color:${s.bd};color:${s.tx}"><span class="ldot" style="background:${s.dot}"></span>${repo.language}</span>`
+    : '';
 
-  const commitRows = commits.length
-    ? commits.slice(0,3).map(c => `
-        <div class="commit-row">
-          <span class="c-hash">${c.sha}</span>
-          <span class="c-msg">${esc(c.message)}</span>
-          <span class="c-time">${timeAgo(c.date)}</span>
-        </div>`).join('')
-    : `<div class="commit-row"><span class="c-msg" style="color:var(--muted)">Sin commits recientes</span></div>`;
-
-  const size = repo.size > 1024 ? (repo.size/1024).toFixed(1)+'MB' : repo.size+'KB';
+  const cRows = commits.slice(0,3).map(c=>`
+    <div class="c-row">
+      <span class="c-hash">${c.sha}</span>
+      <span class="c-msg">${esc(c.message)}</span>
+      <span class="c-time">${ago(c.date)}</span>
+    </div>`).join('') || `<div class="c-row"><span class="c-msg" style="color:var(--text3)">Sin commits recientes</span></div>`;
 
   return `
-    <div class="repo-card" style="animation-delay:${0.04*idx}s">
-      <div class="card-accent" style="background:linear-gradient(90deg,${accentColor},transparent)"></div>
-      <div class="card-body">
-        <div class="card-header">
-          <div class="card-title-wrap">
-            <div class="card-name" title="${esc(repo.name)}">${esc(repo.name)}</div>
-            <div class="card-desc">${esc(repo.description || 'Sin descripción')}</div>
-          </div>
-          ${langChip}
+  <div class="repo-card" style="animation-delay:${.04*idx}s">
+    <div class="card-top-bar" style="background:${accentGrad}"></div>
+    <div class="card-inner">
+      <div class="card-hd">
+        <div class="card-hd-icon">
+          <svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
         </div>
-
-        <div class="stats-bar">
-          <div class="stat-cell"><span class="stat-ico">⭐</span><span class="stat-v">${repo.stargazers_count}</span><span class="stat-l">Stars</span></div>
-          <div class="stat-cell"><span class="stat-ico">🍴</span><span class="stat-v">${repo.forks_count}</span><span class="stat-l">Forks</span></div>
-          <div class="stat-cell"><span class="stat-ico">👁</span><span class="stat-v">${repo.watchers_count}</span><span class="stat-l">Watch</span></div>
-          <div class="stat-cell"><span class="stat-ico">📦</span><span class="stat-v">${size}</span><span class="stat-l">Size</span></div>
-        </div>
-
-        <div class="issues-strip">
-          <div class="iss-pill open">
-            <span>Issues abiertos</span>
-            <span class="iss-num">${repo.open_issues_count}</span>
+        <div style="flex:1;min-width:0">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:3px">
+            <div class="card-name">${esc(repo.name)}</div>
+            ${chipHtml}
           </div>
-          <div class="iss-pill other">
-            <span>Rama principal</span>
-            <span style="font-weight:700;font-family:var(--mono);font-size:11px">${esc(repo.default_branch)}</span>
-          </div>
-        </div>
-
-        <div class="commit-log">${commitRows}</div>
-
-        <div class="card-foot">
-          <div class="push-ind">
-            <span class="pdot ${pc}"></span>
-            Push ${timeAgo(repo.pushed_at)}
-          </div>
-          <a class="gh-link" href="${repo.html_url}" target="_blank" rel="noopener">
-            GitHub
-            <svg width="11" height="11" viewBox="0 0 24 24" fill="currentColor"><path d="M19 19H5V5h7V3H5a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z"/></svg>
-          </a>
+          <div class="card-desc">${esc(repo.description||'Sin descripción')}</div>
         </div>
       </div>
-    </div>`;
+
+      <div class="card-stats">
+        <div class="cs">
+          <div class="cs-ico"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
+          <div class="cs-v">${repo.stargazers_count}</div><div class="cs-l">Stars</div>
+        </div>
+        <div class="cs">
+          <div class="cs-ico"><svg viewBox="0 0 24 24"><circle cx="18" cy="18" r="3"/><circle cx="6" cy="6" r="3"/><path d="M13 6h3a2 2 0 0 1 2 2v7"/><path d="M6 9v12"/></svg></div>
+          <div class="cs-v">${repo.forks_count}</div><div class="cs-l">Forks</div>
+        </div>
+        <div class="cs">
+          <div class="cs-ico"><svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+          <div class="cs-v">${repo.watchers_count}</div><div class="cs-l">Watch</div>
+        </div>
+        <div class="cs">
+          <div class="cs-ico"><svg viewBox="0 0 24 24"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></div>
+          <div class="cs-v">${fmtSize(repo.size)}</div><div class="cs-l">Tamaño</div>
+        </div>
+      </div>
+
+      <div class="card-health">
+        ${healthBar('Stars',  repo.stargazers_count, maxStars, 'var(--amber)')}
+        ${healthBar('Forks',  repo.forks_count,      maxForks, 'var(--cyan)')}
+        ${healthBar('Issues', repo.open_issues_count, Math.max(repo.open_issues_count,5), 'var(--red)')}
+      </div>
+
+      <div class="card-issues">
+        <div class="iss open">
+          <div style="display:flex;align-items:center;gap:5px">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Issues
+          </div>
+          <span class="iss-num">${repo.open_issues_count}</span>
+        </div>
+        <div class="iss branch">
+          <div style="display:flex;align-items:center;gap:5px">
+            <svg viewBox="0 0 24 24"><line x1="6" y1="3" x2="6" y2="15"/><circle cx="18" cy="6" r="3"/><circle cx="6" cy="18" r="3"/><path d="M18 9a9 9 0 0 1-9 9"/></svg>
+            Rama
+          </div>
+          <span style="font-size:11px;font-weight:700">${esc(repo.default_branch)}</span>
+        </div>
+      </div>
+
+      <div>
+        <div class="card-commits-lbl">Commits recientes</div>
+        ${cRows}
+      </div>
+
+      <div class="card-foot">
+        <div class="push-ind">
+          <div class="pdot ${pc}"></div>
+          Push ${ago(repo.pushed_at)}
+        </div>
+        <a class="gh-link" href="${repo.html_url}" target="_blank" rel="noopener">
+          Ver en GitHub
+          <svg viewBox="0 0 24 24"><line x1="7" y1="17" x2="17" y2="7"/><polyline points="7 7 17 7 17 17"/></svg>
+        </a>
+      </div>
+    </div>
+  </div>`;
+}
+
+// ── TOAST ──
+function toast(msg, dur=7000) {
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.style.display='block';
+  setTimeout(()=>t.style.display='none', dur);
 }
 
 // ── FETCH COMMITS ──
-async function fetchCommits(repoName) {
+async function getCommits(name) {
   try {
-    const data = await get(`https://api.github.com/repos/${ORG}/${repoName}/commits?per_page=3`);
-    return data.map(c => ({
-      sha: c.sha.slice(0,7),
-      message: c.commit.message.split('\n')[0].slice(0,60),
-      date: c.commit.author.date
-    }));
+    const data = await get(`https://api.github.com/repos/${ORG}/${name}/commits?per_page=5`);
+    return data.map(c=>({ sha:c.sha.slice(0,7), message:c.commit.message.split('\n')[0].slice(0,65), date:c.commit.author.date }));
   } catch { return []; }
 }
 
-// ── MAIN LOAD ──
+// ── MAIN ──
 async function loadAll() {
-  document.getElementById('content').style.display = 'none';
-  document.getElementById('loading-screen').style.display = 'flex';
-  document.getElementById('load-status').textContent = 'Conectando con GitHub API...';
+  document.getElementById('content').style.display='none';
+  document.getElementById('loader').style.display='flex';
   document.getElementById('btn-refresh').classList.add('spinning');
+  setStatus('Conectando con GitHub API...');
 
   try {
-    // Fetch repos — intenta como org, fallback a user
-    document.getElementById('load-status').textContent = 'Cargando repositorios...';
-    let repos = [];
-    const endpoints = [
-      `https://api.github.com/orgs/${ORG}/repos`,
-      `https://api.github.com/users/${ORG}/repos`
-    ];
-    for (const base of endpoints) {
+    setStatus('Cargando repositorios...');
+    let repos=[], tried=false;
+    for (const base of [`https://api.github.com/orgs/${ORG}/repos`, `https://api.github.com/users/${ORG}/repos`]) {
       try {
-        let page = 1;
-        while (true) {
-          const batch = await get(`${base}?type=public&per_page=100&page=${page}&sort=pushed`);
-          repos = repos.concat(batch);
-          if (batch.length < 100) break;
-          page++;
+        let p=1;
+        while(true) {
+          const b = await get(`${base}?type=public&per_page=100&page=${p}&sort=pushed`);
+          repos=repos.concat(b); if(b.length<100) break; p++;
         }
-        if (repos.length) break; // éxito, no necesitamos el fallback
-      } catch { repos = []; }
+        if(repos.length) break;
+      } catch { repos=[]; }
     }
-    if (!repos.length) throw new Error('No se encontraron repos públicos. Verifica que la org/usuario existe y tiene repos públicos.');
+    if(!repos.length) throw new Error('No se encontraron repositorios públicos.');
 
-    // KPIs
-    const totalStars  = repos.reduce((a,r) => a + r.stargazers_count, 0);
-    const totalForks  = repos.reduce((a,r) => a + r.forks_count, 0);
-    const totalIssues = repos.reduce((a,r) => a + r.open_issues_count, 0);
-    const langs = [...new Set(repos.map(r => r.language).filter(Boolean))];
-    const sortedByPush = [...repos].sort((a,b) => new Date(b.pushed_at)-new Date(a.pushed_at));
-    const lastPushRepo = sortedByPush[0];
+    // KPIs basicos
+    const totalStars  = repos.reduce((a,r)=>a+r.stargazers_count,0);
+    const totalForks  = repos.reduce((a,r)=>a+r.forks_count,0);
+    const totalIssues = repos.reduce((a,r)=>a+r.open_issues_count,0);
+    const langs = [...new Set(repos.map(r=>r.language).filter(Boolean))];
+    const sorted = [...repos].sort((a,b)=>new Date(b.pushed_at)-new Date(a.pushed_at));
 
-    document.getElementById('k-repos').textContent    = repos.length;
-    document.getElementById('k-stars').textContent    = totalStars;
-    document.getElementById('k-forks').textContent    = totalForks;
-    document.getElementById('k-issues').textContent   = totalIssues;
-    document.getElementById('k-langs').textContent    = langs.length;
-    document.getElementById('k-lastpush').textContent = timeAgo(lastPushRepo?.pushed_at);
-    document.getElementById('k-lastpush-repo').textContent = lastPushRepo?.name || '—';
+    document.getElementById('k-repos').textContent  = repos.length;
+    document.getElementById('k-stars').textContent  = totalStars;
+    document.getElementById('k-forks').textContent  = totalForks;
+    document.getElementById('k-issues').textContent = totalIssues;
+    document.getElementById('k-langs').textContent  = langs.length;
     document.getElementById('repo-badge').textContent = `${repos.length} repos`;
-    document.getElementById('last-update').textContent = `Actualizado: ${new Date().toLocaleTimeString('es-CO')}`;
+    document.getElementById('tb-time').textContent  = `Actualizado ${new Date().toLocaleTimeString('es-CO')}`;
 
-    // Commits — chunked parallel
-    document.getElementById('load-status').textContent = 'Cargando commits...';
-    const CHUNK = 4;
+    // Commits
+    setStatus('Cargando historial de commits...');
     const allCommits = {};
-    for (let i = 0; i < repos.length; i += CHUNK) {
+    const CHUNK = 4;
+    for(let i=0; i<repos.length; i+=CHUNK) {
       const chunk = repos.slice(i, i+CHUNK);
-      const results = await Promise.all(chunk.map(r => fetchCommits(r.name)));
-      chunk.forEach((r,j) => allCommits[r.name] = results[j]);
-      document.getElementById('load-status').textContent =
-        `Cargando commits... ${Math.min(i+CHUNK, repos.length)}/${repos.length}`;
+      const res = await Promise.all(chunk.map(r=>getCommits(r.name)));
+      chunk.forEach((r,j)=>allCommits[r.name]=res[j]);
+      setStatus(`Commits: ${Math.min(i+CHUNK,repos.length)}/${repos.length} repos`);
     }
+
+    const totalCommits = Object.values(allCommits).reduce((a,c)=>a+c.length,0);
+    document.getElementById('k-commits').textContent = totalCommits;
+    document.getElementById('k-lastpush-repo').textContent = sorted[0]?.name || '—';
 
     // Charts
-    buildCharts(repos, allCommits);
+    drawCharts(repos, allCommits);
+
+    // Timeline
+    await buildTimeline(repos, allCommits);
 
     // Cards
+    const maxStars = Math.max(...repos.map(r=>r.stargazers_count),1);
+    const maxForks = Math.max(...repos.map(r=>r.forks_count),1);
     const grid = document.getElementById('cards-grid');
-    grid.innerHTML = '';
-    sortedByPush.forEach((repo, idx) => {
-      grid.insertAdjacentHTML('beforeend', buildCard(repo, allCommits[repo.name]||[], idx));
-    });
+    grid.innerHTML='';
+    sorted.forEach((r,i) => grid.insertAdjacentHTML('beforeend', buildCard(r, allCommits[r.name]||[], maxStars, maxForks, i)));
 
-    // Show
-    document.getElementById('loading-screen').style.display = 'none';
-    document.getElementById('content').style.display = 'block';
+    document.getElementById('loader').style.display='none';
+    document.getElementById('content').style.display='block';
 
   } catch(err) {
-    document.getElementById('loading-screen').style.display = 'none';
-    document.getElementById('content').style.display = 'block';
-    const toast = document.getElementById('error-toast');
-    toast.textContent = err.message.includes('403')
-      ? '⚠ Rate limit de GitHub alcanzado. Abre el sidebar → ícono 🔑 → agrega tu token personal.'
-      : `⚠ Error: ${err.message}`;
-    toast.style.display = 'block';
-    setTimeout(() => toast.style.display = 'none', 8000);
+    document.getElementById('loader').style.display='none';
+    document.getElementById('content').style.display='block';
+    const msg = err.message.includes('403')
+      ? '⚠ Rate limit alcanzado (60 req/h). Haz clic en el ícono 🔑 del sidebar para agregar tu GitHub Token.'
+      : `⚠ ${err.message}`;
+    toast(msg, 10000);
   }
 
   document.getElementById('btn-refresh').classList.remove('spinning');
 }
 
+function setStatus(t) { document.getElementById('l-status').textContent=t; }
 function refreshAll() { loadAll(); }
 
 loadAll();
